@@ -1,0 +1,220 @@
+/* .listDonHang {
+    display: none;
+} */
+
+.infoUser table {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.infoUser table th {
+    font-size: 26px;
+    font-weight: bold;
+    padding: 10px 5px;
+}
+
+.infoUser table td {
+    font-size: 18px;
+    padding: 8px 5px;
+}
+.infoUser table td:first-child {
+    font-weight: bold;
+    text-align: right;
+}
+
+.infoUser input {
+    font-size: 20px;
+    border-radius: 5px;
+    text-align: center;
+    transition-duration: .15s;
+    border: 1px solid #aaa;
+    padding: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.infoUser input:read-only {
+    border: 1px solid transparent;
+    background-color: #f5f5f5;
+}
+
+/* Nút sửa thông tin */
+.infoUser .fa-pencil {
+    text-align: center;
+    border-radius: 5px;
+    font-size: 1em;
+    padding: 7px;
+    transition-duration: .2s;
+    cursor: pointer;
+    min-width: 70px;
+    display: inline-block;
+}
+
+.infoUser .fa-pencil:hover {
+    background-color: #ccc;
+    color: #444;
+}
+
+/* Thay đổi mật khẩu */
+#khungDoiMatKhau {
+    padding: 0;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+#khungDoiMatKhau tr td {
+    padding: 0;
+}
+#khungDoiMatKhau tr td div {
+    max-height: 0;
+    overflow: hidden;
+    transition-duration: 0.3s;
+}
+
+/* active */
+#khungDoiMatKhau.active, #khungDoiMatKhau.active tr td {
+    padding: 5px 0;
+}
+#khungDoiMatKhau.active td div {
+    max-height: 100px;
+    transition-duration: 0.6s;
+}
+
+#khungDoiMatKhau button {
+    width: 100%;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    font-weight: bold;
+}
+#khungDoiMatKhau button:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+/* ========== STYLE CHO ĐỊA CHỈ ========== */
+.diachi-item {
+    margin: 10px 0;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 20px;
+}
+
+.diachi-item:hover {
+    border-color: #4CAF50;
+    background-color: #f0f8f0;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.diachi-item span {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.4;
+    padding-right: 80px;
+}
+
+.diachi-item i {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.diachi-item i.fa-edit {
+    right: 40px;
+    color: #2196F3;
+}
+
+.diachi-item i.fa-edit:hover {
+    background-color: #e3f2fd;
+    color: #1976D2;
+}
+
+.diachi-item i.fa-trash {
+    right: 10px;
+    color: #f44336;
+}
+
+.diachi-item i.fa-trash:hover {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+/* Nút Thêm địa chỉ */
+#btnThemDiaChi {
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+#btnThemDiaChi:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+#btnThemDiaChi:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+#btnThemDiaChi i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+/* Đảm bảo bảng hiển thị tốt trên mobile */
+@media (max-width: 768px) {
+    .infoUser table {
+        width: 100%;
+    }
+    
+    .infoUser table th {
+        font-size: 20px;
+    }
+    
+    .infoUser table td {
+        font-size: 16px;
+        padding: 6px 3px;
+    }
+    
+    .diachi-item span {
+        padding-right: 70px;
+        font-size: 14px;
+    }
+    
+    .diachi-item i {
+        padding: 6px;
+        font-size: 14px;
+    }
+    
+    .diachi-item i.fa-edit {
+        right: 35px;
+    }
+    
+    .diachi-item i.fa-trash {
+        right: 8px;
+    }
+}

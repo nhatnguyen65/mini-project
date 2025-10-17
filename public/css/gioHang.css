@@ -1,0 +1,482 @@
+/* https://www.w3schools.com/css/tryit.asp?filename=trycss_table_fancy */
+.listSanPham {
+	margin: 50px auto;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* thêm border và padding cho th */
+.listSanPham th {
+    border: 1px solid #ddd;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+.listSanPham td {
+    border: 1px solid #ddd;
+}
+
+/* Đổi màu button khi hover vào tr */
+.listSanPham tr:hover td button {
+    background-color: rgb(176, 212, 177)
+}
+
+/* Canh giữa cho cột stt và th */
+.listSanPham tr td:first-child, .listSanPham tr th {
+	text-align: center;
+}
+
+/* những tr chẵn sẽ có màu khác */
+.listSanPham tr:nth-of-type(even) {background-color: #f2f2f2;}
+
+/* Dòng tổng tiền thanh toán sẽ có màu đậm hơn */
+.listSanPham tr:not(:last-child):hover {background-color: #e5e2e2;}
+
+/* Last child là dòng tổng tiền */
+.listSanPham tr:last-child { background-color: #aaa; }
+
+/* Số lượng */
+.listSanPham .soluong {
+    text-align: center;
+}
+.listSanPham .soluong button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: transparent; 
+}
+.listSanPham .soluong button:hover {
+    background-color: #4CAF50; 
+}
+.listSanPham .soluong input {
+    border: none;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    width: 5em;
+    height: 2em;
+}
+
+/* Link sản phẩm */
+.noPadding {
+    padding: 0 0 0 10px;
+    line-height: 2.5em;
+}
+.listSanPham td a {
+    display: block;
+    position: relative;
+    padding: 5px 0;
+}
+.listSanPham td a:hover {
+    text-decoration: underline;
+}
+
+/* Hình ảnh sản phẩm */
+.imgHide img {
+    position: absolute;
+    right: -130px;
+    width: 150px;
+    height: 0;
+    border-radius: 10px;
+    transition-duration: .1s;
+}
+.imgHide a:hover img {
+    height: 150px;
+}
+
+/* Cột Giá tiền canh lề phải */
+.alignRight {
+    text-align: right;
+    padding-right: 30px;  
+}
+
+
+
+/* Nút xóa */
+.fa-trash {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    color: #999;
+    cursor: pointer;
+    transition-duration: .2s;
+}
+
+.fa-trash:hover {
+    color: red;
+    transform: scale(1.5)
+}
+
+/* Nút thanh toán */
+.thanhtoan {
+    font-size: 1.5em;
+    padding: 10px 15px;
+    font-weight: bold;
+    background-color: rgb(197, 223, 199);
+    cursor: pointer;
+    transition-duration: .2s;
+}
+.thanhtoan:hover {
+    background-color: #4CAF50; 
+}
+
+.xoaHet {
+    border: none;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+}
+.xoaHet:hover {
+    background-color: rgb(224, 65, 65);
+}
+
+/* ========== MODAL CHỌN ĐỊA CHỈ ========== */
+.address-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.address-modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 0;
+    border: none;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.close-address {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    z-index: 1001;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-address:hover {
+    color: #000;
+}
+
+.address-modal h2 {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.address-list {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.address-item {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.address-item:hover {
+    border-color: #2196F3;
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+}
+
+.address-item.selected {
+    border-color: #2196F3;
+    background-color: #f3f8ff;
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+.address-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #2196F3;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.address-actions {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-add-address {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-address:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+/* ========== MODAL THANH TOÁN ========== */
+.payment-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.payment-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: none;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.close-payment {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    z-index: 1001;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-payment:hover {
+    color: #000;
+}
+
+.payment-modal h2 {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.payment-methods {
+    padding: 20px;
+}
+
+.payment-option {
+    margin-bottom: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.payment-option:hover {
+    border-color: #4CAF50;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+}
+
+.payment-option.selected {
+    border-color: #4CAF50;
+    background-color: #f8fff8;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.payment-option label {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+}
+
+.payment-option label i {
+    font-size: 32px;
+    color: #4CAF50;
+    margin-right: 20px;
+    min-width: 40px;
+}
+
+.payment-info h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.payment-info p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.payment-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 16px;
+}
+
+.summary-row.total {
+    border-top: 2px solid #4CAF50;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #4CAF50;
+}
+
+.payment-actions {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-cancel, .btn-confirm {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-confirm:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .payment-modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .payment-option label {
+        padding: 15px;
+    }
+    
+    .payment-option label i {
+        font-size: 24px;
+        margin-right: 15px;
+    }
+    
+    .payment-info h3 {
+        font-size: 16px;
+    }
+    
+    .payment-info p {
+        font-size: 13px;
+    }
+    
+    .payment-actions {
+        flex-direction: column;
+    }
+}

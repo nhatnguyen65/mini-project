@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="shortcut icon" href="img/favicon.ico" />
+
+	<title>Thế giới điện thoại</title>
+
+	<!-- Load font awesome icons -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+	 crossorigin="anonymous">
+
+	<!-- our files -->
+	<!-- css -->
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/topnav.css">
+	<link rel="stylesheet" href="css/header.css">
+	<link rel="stylesheet" href="css/taikhoan.css">
+	<link rel="stylesheet" href="css/gioHang.css">
+	<link rel="stylesheet" href="css/footer.css">
+	<!-- js -->
+	<script src="js/classes.js"></script>
+	<script src="js/dungchung.js"></script>
+	<script src="js/giohang.js"></script>
+
+</head>
+
+<body>
+	<script> addTopNav(); </script>
+
+	<section style="min-height: 85vh">
+		<script> addHeader(); </script>
+
+		<table class="listSanPham" > </table>
+		
+		<!-- Modal chọn địa chỉ nhận hàng -->
+		<div id="addressModal" class="address-modal">
+			<div class="address-modal-content">
+				<span class="close-address" onclick="closeAddressModal()">&times;</span>
+				<h2>Chọn địa chỉ nhận hàng</h2>
+				
+				<div class="address-list" id="addressList">
+					<!-- Danh sách địa chỉ sẽ được thêm bằng JavaScript -->
+				</div>
+				
+				<div class="address-actions">
+					<button class="btn-cancel" onclick="closeAddressModal()">Hủy</button>
+					<button class="btn-add-address" onclick="goToAddAddress()">
+						<i class="fa fa-plus"></i> Thêm địa chỉ mới
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal chọn phương thức thanh toán -->
+		<div id="paymentModal" class="payment-modal">
+			<div class="payment-modal-content">
+				<span class="close-payment" onclick="closePaymentModal()">&times;</span>
+				<h2>Chọn phương thức thanh toán</h2>
+				
+				<div class="payment-methods">
+					<div class="payment-option" onclick="selectPaymentMethod('cod',event)">
+						<input type="radio" id="cod" name="payment" value="cod">
+						<label for="cod">
+							<i class="fa fa-truck"></i>
+							<div class="payment-info">
+								<h3>Thanh toán khi nhận hàng (COD)</h3>
+								<p>Bạn sẽ thanh toán bằng tiền mặt khi nhận được hàng</p>
+							</div>
+						</label>
+					</div>
+					
+					<div class="payment-option" onclick="selectPaymentMethod('vietqr',event)">
+						<input type="radio" id="vietqr" name="payment" value="vietqr">
+						<label for="vietqr">
+							<img src="https://img.vietqr.io/image/mbbank-7922620599999-compact.jpg" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;">
+							<div class="payment-info" style="display:inline-block;">
+								<h3>Thanh toán qua VietQR</h3>
+								<p>Quét mã QR bằng app ngân hàng để chuyển khoản</p>
+							</div>
+						</label>
+					</div>
+				</div>
+				
+				<div class="payment-summary">
+					<div class="summary-row">
+						<span>Tổng tiền hàng:</span>
+						<span id="totalAmount">0 ₫</span>
+					</div>
+					<div class="summary-row">
+						<span>Phí vận chuyển:</span>
+						<span id="shippingFee">30.000 ₫</span>
+					</div>
+					<div class="summary-row total">
+						<span>Tổng cộng:</span>
+						<span id="finalTotal">0 ₫</span>
+					</div>
+				</div>
+				
+				<div class="payment-actions">
+					<button class="btn-cancel" onclick="closePaymentModal()">Hủy</button>
+					<button class="btn-confirm" onclick="confirmPayment()">Xác nhận thanh toán</button>
+				</div>
+			</div>
+		</div>
+		
+	</section> <!-- End Section -->
+
+	<script>
+		addContainTaiKhoan();
+	</script>
+
+	<div class="footer"><script>addFooter();</script></div>
+
+	<i class="fa fa-arrow-up" id="goto-top-page" onclick="gotoTop()"></i>
+</body>
+
+</html>
