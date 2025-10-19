@@ -17,6 +17,10 @@ async function loadProduct() {
     }
 }
 
+document.querySelector("#out-page").addEventListener("click", (e) => {
+    history.back();
+});
+
 function renderProduct(p) {
     document.getElementById("masp").value = p.masp;
     document.getElementById("productName").value = p.name;

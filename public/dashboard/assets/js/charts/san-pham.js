@@ -1,8 +1,10 @@
 import { API_BASE_URL } from "../config.js";
 
+const API_BASE = `${API_BASE_URL}/products`;
+
 async function loadProducts() {
     try {
-        const res = await fetch(`${API_BASE_URL}/products`);
+        const res = await fetch(API_BASE);
         return await res.json();
     } catch (error) {
         console.error(`Lỗi trang Sản Phẩm, loadProducts: ${error}`);
@@ -38,7 +40,7 @@ async function renderProducts(products) {
         products.filter((p) => p.stock && p.stock <= 10).length || 0
     } sp`;
     document.querySelector("#out-stock").innerText = `${
-        products.filter((p) => p.stock && p.stock === 0).length || 0
+        products.filter((p) => p.stock === 0).length || 0
     } sp`;
     document.querySelector("#inventory-value").innerText = formatCurrency(
         products.reduce((sum, p) => sum + (p.stock || 0) * p.price, 0)
@@ -382,7 +384,7 @@ async function tableProduct(products, currentPage = 1, itemsPerPage = 10) {
         btn.addEventListener("click", async () => {
             const id = btn.dataset.id;
             try {
-                const res = await fetch(`${API_BASE_URL}/products/${id}`);
+                const res = await fetch(`${API_BASE}/${id}`);
                 if (!res.ok)
                     throw new Error("Không lấy được dữ liệu sản phẩm!");
                 const product = await res.json();
@@ -425,7 +427,7 @@ loadProducts()
         console.log(`Lỗi trang Sản Phẩm, tableProduct: ${error}`)
     );
 function showProductDetail(product) {
-    document.getElementById("detail-img").src = `../../${product.img}`;
+    document.getElementById("detail-img").src = `${product.img}`;
     document.getElementById("detail-name").textContent = product.name;
     document.getElementById("detail-company").textContent = product.company;
     document.getElementById("detail-masp").textContent = product.masp;
@@ -459,7 +461,7 @@ function showProductDetail(product) {
     if (editBtn) {
         editBtn.onclick = () => {
             // chuyển hướng sang trang chỉnh sửa, kèm id sản phẩm
-            location.href = `chinh-sua.html?id=${product._id}`;
+            location.href = `chinh-sua-sp.html?id=${product._id}`;
         };
     }
 }
