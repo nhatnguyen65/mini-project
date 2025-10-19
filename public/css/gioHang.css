@@ -101,8 +101,6 @@
 /* Nút xóa */
 .fa-trash {
     text-align: center;
-    width: 100%;
-    height: 100%;
     color: #999;
     cursor: pointer;
     transition-duration: .2s;
@@ -110,7 +108,6 @@
 
 .fa-trash:hover {
     color: red;
-    transform: scale(1.5)
 }
 
 /* Nút thanh toán */

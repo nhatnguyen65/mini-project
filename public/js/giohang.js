@@ -1,25 +1,28 @@
-var products;
-var currentUser; // user hiện tại, biến toàn cục
+// ================= GLOBAL VARIABLES =================
+var products = []; // Danh sách sản phẩm trong giỏ hàng
+var cart = null;   // Giỏ hàng từ server
+var currentUser = null; // User hiện tại
+
 window.onload = async function () {
     khoiTao();
    try {
     const res = await fetch("http://localhost:5000/api/products");
     var list_products = await res.json();
-    // autocomplete cho khung tìm kiếm (sau khi có dữ liệu)
-    autocomplete(document.getElementById('search-box'), list_products);
-
-    // render các phần còn lại (lọc, phân trang, hiển thị sp)
-   // khoiTaoTrangChu();
   } catch (err) {
     console.error("Lỗi tải sản phẩm:", err);
   }
 
+      // Lấy user hiện tại
+    
 
-    // thêm tags (từ khóa) vào khung tìm kiếm
-    var tags = ["Samsung", "iPhone", "Huawei", "Oppo", "Mobi"];
-    for (var t of tags) addTags(t, "index.html?search=" + t)
+    const currentUser = await getCurrentUser(); 
+ if (!currentUser) {
+    addAlertBox('Vui lòng đăng nhập trước khi xem giỏ hàng', '#e74c3c', '#fff', 4000);
+    setTimeout(() => window.location.href = 'index.html', 1500);
+    return;
+}
 
-    currentUser = getCurrentUser();
+
     //Đảm bảo rằng ta chờ loadCart() chạy xong trước khi vẽ bảng.
     await loadCart(); // tải giỏ hàng từ server trước
     addProductToTable(currentUser);// giờ products đã có dữ liệu->products đã được load sẵn, không còn bị undefined.
@@ -41,20 +44,24 @@ window.onload = async function () {
 async function loadCart() {
     if (!currentUser) return;
     try {
-        const res = await fetch(`http://localhost:5000/api/cart?userId=${currentUser._id}`);
+        const res = await fetch('http://localhost:5000/api/cart',{
+            credentials: 'include'
+        });
         const data = await res.json();
         if (data.success) {
             cart=data.cart;
-            products =cart.products;
+            products =cart.products || [];
         } else {
             products = [];
         }
     } catch (err) {
         console.error("Lỗi tải giỏ hàng:", err);
+        products = [];
     }
 }
+
 //render bảng giỏ hàng
-async function addProductToTable(user) {
+ function addProductToTable(user) {
     var table = document.getElementsByClassName('listSanPham')[0];
     var s = `
         <tbody>
@@ -68,7 +75,6 @@ async function addProductToTable(user) {
                 <th>Thời gian</th>
                 <th>Xóa</th>
             </tr>`;
-    if (!Array.isArray(products)) products = [];
     if (!user) {
         s += `
             <tr>
@@ -82,7 +88,7 @@ async function addProductToTable(user) {
         table.innerHTML = s;
         return;
     }
-     if ( products.length == 0) {
+     if (!Array.isArray(products) || products.length === 0) {
         s += `
             <tr>
                 <td colspan="8"> 
@@ -124,7 +130,7 @@ async function addProductToTable(user) {
                         <img src="${p.img}">
                     </a>
                 </td>
-                <td class="alignRight">${price} ₫</td>
+                <td class="alignRight">${numToString(price)} ₫</td>
                 <td class="soluong">
                     <button onclick="giamSoLuong('${i}')"><i class="fa fa-minus"></i></button>
                     <input size="1" onchange="capNhatSoLuongFromInput(this,${i})" value=${soluongSp}>
@@ -168,40 +174,51 @@ function chonTatCa(cb) {
 
 // Xóa 1 sản phẩm trong giỏ
 async function xoaSanPhamTrongGioHang(i) {
-     const productId = products[i].product._id;
-    if (window.confirm('Xác nhận xóa')) {
+    const productId = products[i].product._id;
+
+    if (window.confirm('Xác nhận xóa sản phẩm này khỏi giỏ hàng?')) {
         try {
-            const res = await fetch(`http://localhost:5000/api/cart?userId=${currentUser._id}&productId=${productId}`, {
-                method: 'DELETE'
+            const res = await fetch(`http://localhost:5000/api/cart?productId=${productId}`, {
+                method: 'DELETE',
+                credentials: 'include' // ✅ quan trọng: gửi cookie session
             });
+
             const data = await res.json();
+
             if (data.success) {
+                // Xóa khỏi mảng local
                 products.splice(i, 1);
-                 capNhatMoiThu();
+                capNhatMoiThu();
+            } else {
+                alert(data.message || 'Không thể xóa sản phẩm.');
             }
         } catch (err) {
-            console.error(err);
+            console.error('Lỗi khi xóa sản phẩm:', err);
         }
-       
     }
 }
 // Xóa tất cả sản phẩm
 async function xoaHet() {
     if (products.length) {
-        if (window.confirm('Bạn có chắc chắn muốn xóa hết sản phẩm trong giỏ !!')) {
+        if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ sản phẩm trong giỏ hàng?')) {
             try {
-        // gọi API xóa tất cả sản phẩm
-        const res = await fetch(`http://localhost:5000/api/cart?userId=${currentUser._id}`, {
-            method: 'DELETE' // server sẽ xóa toàn bộ products
-        });
-        const data = await res.json();
-        if (data.success) {
-           products = [];//xóa local
-           capNhatMoiThu();
+                const res = await fetch('http://localhost:5000/api/cart', {
+                    method: 'DELETE',
+                    credentials: 'include' // ✅ gửi session
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Làm trống giỏ hàng local
+                    products = [];
+                    capNhatMoiThu();
+                } else {
+                    alert(data.message || 'Không thể xóa giỏ hàng.');
+                }
+            } catch (err) {
+                console.error('Lỗi khi xóa toàn bộ sản phẩm:', err);
             }
-    } catch (err) {
-        console.error("Lỗi xóa hết sản phẩm:", err);
-    }
         }
     }
 }
@@ -218,14 +235,15 @@ async function capNhatSoLuongFromInput(inp, index) {
 async function giamSoLuong(index) {
     if (products[index].soLuong > 1) products[index].soLuong--;
      await updateCartOnServer();
-    capNhatMoiThu();
+     capNhatMoiThu();
 }
-// Cập nhật giỏ hàng lên server
+//  Cập nhật giỏ hàng lên server 
 async function updateCartOnServer() {
     try {
-        await fetch(`http://localhost:5000/api/cart?userId=${currentUser._id}`, {
+        const res = await fetch('http://localhost:5000/api/cart', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // ✅ gửi cookie session lên server
             body: JSON.stringify({
                 products: products.map(p => ({
                     product: p.product._id,
@@ -233,10 +251,20 @@ async function updateCartOnServer() {
                 }))
             })
         });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            console.warn('⚠️ Không thể cập nhật giỏ hàng:', data.message || 'Lỗi không xác định');
+        } else {
+            console.log('✅ Giỏ hàng đã được cập nhật trên server');
+        }
+
     } catch (err) {
-        console.error("Lỗi cập nhật giỏ hàng:", err);
+        console.error('❌ Lỗi cập nhật giỏ hàng:', err);
     }
 }
+
 async function tangSoLuong(index) {
      products[index].soLuong++;
       await updateCartOnServer();  
@@ -245,8 +273,8 @@ async function tangSoLuong(index) {
 }
 
 // Thanh toán chỉ các sản phẩm được tick
-function thanhToan() {
-    var c_user = getCurrentUser();
+async function thanhToan() {
+    var c_user =await getCurrentUser();
     if (c_user.off) {
         alert('Tài khoản của bạn hiện đang bị khóa nên không thể mua hàng!');
         addAlertBox('Tài khoản của bạn đã bị khóa bởi Admin.', '#aa0000', '#fff', 10000);
@@ -483,6 +511,39 @@ function confirmPayment() {
     }
 }
 
+// Xử lý thanh toán COD
+async function processCOD(selectedProducts) {
+    if (window.confirm('Xác nhận thanh toán khi nhận hàng (COD) cho các sản phẩm đã chọn?')) {
+        // Tạo đơn hàng với phương thức COD
+       const data={
+            "products": selectedProducts,
+            "ngayDat": new Date(),
+            "orderStatus":'Đang xử lý',
+            "paymentMethod": 'COD',
+            "paymentStatus":'Chưa thanh toán',
+            "diaChiNhanHang": window.selectedAddress || 'Chưa xác định'
+        };
+        
+        const res= await fetch(`http://localhost:5000/api/orders`,{
+             method:'POST',
+             headers:{
+             "Content-Type":"application/json",
+             },
+             credentials: 'include', // ✅ gửi cookie session lên server
+            body:JSON.stringify(data)
+        });
+        const result=await res.json();
+       if(!res.ok){
+        console.error('Tạo đơn hàng thất bại:',result );
+        addAlertBox('Tạo đơn hàng thất bại, vui lòng thử lại.', '#e74c3c', '#fff', 4000);
+        return;
+       }  
+        await loadCart();  // tải lại giỏ hàng từ server
+        capNhatMoiThu();
+        closePaymentModal();
+        addAlertBox('Đơn hàng COD đã được tạo thành công! Bạn sẽ thanh toán khi nhận hàng.', '#17c671', '#fff', 5000);
+    }
+}
 
 // Xử lý thanh toán VietQR
  function processVietQR(selectedProducts) {
@@ -506,7 +567,7 @@ function confirmPayment() {
             "paymentStatus":'Chưa thanh toán',
             "diaChiNhanHang": window.selectedAddress || 'Chưa xác định'
         };
-        
+          
             closePaymentModal();
         
         // Hiển thị modal QR
@@ -560,11 +621,12 @@ function confirmPayment() {
             data.paymentStatus = 'Chờ xác nhận chuyển khoản';
             data.orderStatus = 'Đang chờ thanh toán';
              // Tạo đơn hàng với phương thức COD
-            const res= await fetch(`http://localhost:5000/api/orders/${currentUser._id}`,{
+            const res= await fetch(`http://localhost:5000/api/orders`,{
              method:'POST',
              headers:{
-            "Content-Type":"application/json"
+             "Content-Type":"application/json",
              },
+             credentials: 'include', // ✅ gửi cookie session lên server
             body:JSON.stringify(data)
         });
         const result=await res.json();
@@ -573,6 +635,8 @@ function confirmPayment() {
         addAlertBox('Tạo đơn hàng thất bại, vui lòng thử lại.', '#e74c3c', '#fff', 4000);
         return;
        }
+            
+            await loadCart();  // tải lại giỏ hàng từ server
             capNhatMoiThu();
             addAlertBox('Shop sẽ kiểm tra giao dịch chuyển khoản của bạn và xác nhận đơn hàng sau!', '#17c671', '#fff', 5000);
             document.body.removeChild(modal);
@@ -601,6 +665,6 @@ function confirmPayment() {
 function capNhatMoiThu() { // Mọi thứ
     animateCartNumber();
     setCurrentUser(currentUser);
-    addProductToTable(currentUser);
     capNhat_ThongTin_CurrentUser();
+    addProductToTable(currentUser);
 }

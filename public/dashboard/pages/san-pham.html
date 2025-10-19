@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <title>
+        Material Dashboard 3 by Creative Tim
+    </title>
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+    <!-- Nucleo Icons -->
+    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- Material Icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <!-- CSS Files -->
+    <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
+</head>
+
+<body class="g-sidenav-show  bg-gray-100">
+    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-radius-lg fixed-start ms-2 bg-white my-2"
+        id="sidenav-main">
+        <div class="sidenav-header">
+            <i class="material-symbols-rounded p-3 cursor-pointer text-dark opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+                aria-hidden="true" id="iconSidenav">close</i>
+            <a class="navbar-brand px-4 py-3 m-0" href="#" target="_blank">
+                <img src="../assets/img/logo-ct-dark.png" class="navbar-brand-img bg-white" width="26" height="26"
+                    alt="main_logo">
+                <span class="ms-1 text-sm text-dark">Dashboard</span>
+            </a>
+        </div>
+        <hr class="horizontal dark mt-0 mb-2">
+        <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="../index.html">
+                        <i class="material-symbols-rounded opacity-5">dashboard</i>
+                        <span class="nav-link-text ms-2 text-sm">Tổng quan</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./don-hang.html">
+                        <i class="material-symbols-rounded opacity-5">shopping_cart</i>
+                        <span class="nav-link-text ms-2 text-sm">Đơn hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active bg-gradient-dark" href="#">
+                        <i class="material-symbols-rounded opacity-5">package_2</i>
+                        <span class="nav-link-text ms-2 text-sm">Sản phẩm</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./khach-hang.html">
+                        <i class="material-symbols-rounded opacity-5">group</i>
+                        <span class="nav-link-text ms-2 text-sm">Khách hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./doanh-thu.html">
+                        <i class="material-symbols-rounded opacity-5">query_stats</i>
+                        <span class="nav-link-text ms-2 text-sm">Doanh thu</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./tai-chinh.html">
+                        <i class="material-symbols-rounded opacity-5">payments</i>
+                        <span class="nav-link-text ms-2 text-sm">Tài chính</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./marketing.html">
+                        <i class="material-symbols-rounded opacity-5">campaign</i>
+                        <span class="nav-link-text ms-2 text-sm">Marketing</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs text-dark font-weight-bolder opacity-5">Account pages
+                    </h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./profile.html">
+                        <i class="material-symbols-rounded opacity-5">person</i>
+                        <span class="nav-link-text ms-1">Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./sign-in.html">
+                        <i class="material-symbols-rounded opacity-5">login</i>
+                        <span class="nav-link-text ms-1">Sign In</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="./sign-up.html">
+                        <i class="material-symbols-rounded opacity-5">assignment</i>
+                        <span class="nav-link-text ms-1">Sign Up</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidenav-footer position-absolute w-100 bottom-0 ">
+        </div>
+    </aside>
+
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+        <!-- Navbar -->
+        <nav class="navbar navbar-main navbar-expand-lg px-0 border-radius-xl blur shadow-blur position-fixed z-index-sticky top-1 start-0 end-0 mx-2 mx-md-3"
+            id="navbarBlur" data-scroll="true">
+            <div class="container-fluid py-1 px-3 d-block d-sm-flex">
+                <nav aria-label="breadcrumb" class="pb-2 pb-sm-0">
+                    <h2 class="breadcrumb bg-transparent m-0 p-0 fs-4">Sản phẩm</h2>
+                    <p class="text-sm mt-1 mb-0 d-none d-md-block">
+                        Theo dõi sản phẩm.
+                    </p>
+                </nav>
+                <div class="collapse navbar-collapse mt-0 me-md-0" id="navbar">
+                    <div
+                        class="box-navbar ms-auto d-flex align-items-center justify-content-end border-radius-xl p-2 bg-white">
+                        <!-- Search -->
+                        <div
+                            class="group-search input-group rounded-3 px-3 d-flex align-items-center justify-content-end bg-gray-100">
+                            <input type="text" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm..."
+                                style="width: 90px;">
+                            <i class="material-symbols-rounded text-muted ps-sm-2 py-2 cursor-pointer">search</i>
+                        </div>
+                        <ul class="m-0 p-0 d-flex align-items-center justify-content-end">
+                            <li class="nav-item ps-3 d-flex align-items-center d-xl-none">
+                                <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                                    <div class="sidenav-toggler-inner">
+                                        <i class="sidenav-toggler-line"></i>
+                                        <i class="sidenav-toggler-line"></i>
+                                        <i class="sidenav-toggler-line"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item ps-3 d-flex align-items-center dropdown">
+                                <a href="javascript:;" class="nav-link text-body p-0 d-flex justify-content-center"
+                                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="material-symbols-rounded">notifications</i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <li class="mb-2">
+                                        <a class="dropdown-item border-radius-md" href="javascript:;">
+                                            <div class="d-flex py-1">
+                                                <div class="my-auto">
+                                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm  me-3 ">
+                                                </div>
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="text-sm font-weight-normal mb-1">
+                                                        <span class="font-weight-bold">New message</span> from Laur
+                                                    </h6>
+                                                    <p class="text-xs text-secondary mb-0">
+                                                        <i class="fa fa-clock me-1"></i>
+                                                        13 minutes ago
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a class="dropdown-item border-radius-md" href="javascript:;">
+                                            <div class="d-flex py-1">
+                                                <div class="my-auto">
+                                                    <img src="../assets/img/small-logos/logo-spotify.svg"
+                                                        class="avatar avatar-sm bg-gradient-dark  me-3 ">
+                                                </div>
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="text-sm font-weight-normal mb-1">
+                                                        <span class="font-weight-bold">New album</span> by Travis Scott
+                                                    </h6>
+                                                    <p class="text-xs text-secondary mb-0">
+                                                        <i class="fa fa-clock me-1"></i>
+                                                        1 day
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item border-radius-md" href="javascript:;">
+                                            <div class="d-flex py-1">
+                                                <div class="avatar avatar-sm bg-gradient-secondary  me-3  my-auto">
+                                                    <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                        <title>credit-card</title>
+                                                        <g stroke="none" stroke-width="1" fill="none"
+                                                            fill-rule="evenodd">
+                                                            <g transform="translate(-2169.000000, -745.000000)"
+                                                                fill="#FFFFFF" fill-rule="nonzero">
+                                                                <g transform="translate(1716.000000, 291.000000)">
+                                                                    <g transform="translate(453.000000, 454.000000)">
+                                                                        <path class="color-background"
+                                                                            d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z"
+                                                                            opacity="0.593633743"></path>
+                                                                        <path class="color-background"
+                                                                            d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z">
+                                                                        </path>
+                                                                    </g>
+                                                                </g>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </div>
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="text-sm font-weight-normal mb-1">
+                                                        Payment successfully completed
+                                                    </h6>
+                                                    <p class="text-xs text-secondary mb-0">
+                                                        <i class="fa fa-clock me-1"></i>
+                                                        2 days
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item ps-3 d-flex align-items-center">
+                                <a href="javascript:;" class="nav-link text-body p-0 d-flex justify-content-center">
+                                    <i class="material-symbols-rounded fixed-plugin-button-nav">settings</i>
+                                </a>
+                            </li>
+                            <li class="nav-item ps-3 d-flex align-items-center dropdown">
+                                <!-- Nếu có avatar -->
+                                <a href="javascript:;" class="nav-link text-body p-0 d-flex justify-content-center"
+                                    id="dropdownAvatar" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="../assets/img/default-avatar.jpg" alt="User" class="rounded-circle"
+                                        style="width:40px; height:40px; object-fit:cover;">
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end px-3 py-3 ms-sm-n4"
+                                    aria-labelledby="dropdownAvatar">
+                                    <li class="mb-2">
+                                        <a class="dropdown-item border-radius-md py-2" href="javascript:;">
+                                            Cài đặt
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a id="logoutBtn" class="dropdown-item border-radius-md py-2"
+                                            href="javascript:;">
+                                            Đăng xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="container-fluid py-2 pt-7">
+            <!-- row pt-5 pt-sm-3 -->
+            <!-- Tổng quan sản phẩm -->
+            <div class="row pt-5 pt-sm-3">
+                <div class="col-md-3 col-sm-6 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">Tổng sản phẩm</h6>
+                            <h4 id="total-products" class="text-success">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">Sắp hết hàng</h6>
+                            <h4 id="low-stock" class="text-warning">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">Đã hết hàng</h6>
+                            <h4 id="out-stock" class="text-danger">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">Giá trị tồn kho</h6>
+                            <h4 id="inventory-value" class="text-info">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ -->
+            <div class="row">
+                <!-- Top sản phẩm bán chạy -->
+                <div class="col-lg-7 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-0">Top 5 sản phẩm bán chạy</h6>
+                            <p class="text-sm">Theo số lượng 30 ngày gần nhất</p>
+                            <div class="pe-2">
+                                <div class="chart">
+                                    <canvas id="chart-top-products" class="chart-canvas" height="300"></canvas>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm">cập nhật hôm nay</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cơ cấu tồn kho -->
+                <div class="col-lg-5 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-0">Cơ cấu tồn kho theo danh mục</h6>
+                            <p class="text-sm">Tỉ trọng theo nhóm hàng</p>
+                            <div class="pe-2">
+                                <div class="chart">
+                                    <canvas id="chart-inventory-structure" class="chart-canvas" height="300"></canvas>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm">cập nhật 1 ngày trước</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Xu hướng doanh số -->
+                <div class="col-lg-12 px-lg-3-75 px-md-1 px-2 mb-lg-4 mb-md-2 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-0">Xu hướng doanh số theo tháng</h6>
+                            <p class="text-sm">12 tháng gần nhất</p>
+                            <div class="pe-2">
+                                <div class="chart">
+                                    <canvas id="chart-sales-trend" class="chart-canvas" height="300"></canvas>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <i class="material-symbols-rounded text-sm my-auto me-1">schedule</i>
+                                <p class="mb-0 text-sm">cập nhật 1 ngày trước</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách chi tiết sản phẩm -->
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header h6 text-dark pb-0">Danh sách sản phẩm</div>
+                        <div class="card-body pt-0">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Mã SP</th>
+                                        <th class="text-center">Tên sản phẩm</th>
+                                        <th class="text-center">Hãng sản xuất</th>
+                                        <th class="text-center">Giá</th>
+                                        <th class="text-center">Tồn kho</th>
+                                        <th class="text-center">Trạng thái</th>
+                                        <th class="text-center">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <!-- <tbody>
+                                    <tr>
+                                        <td>SP001</td>
+                                        <td>iPhone 15 Pro</td>
+                                        <td>Điện thoại</td>
+                                        <td>₫ 28,000,000</td>
+                                        <td>250</td>
+                                        <td><span class="badge bg-success">Còn hàng</span></td>
+                                        <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP002</td>
+                                        <td>Samsung Galaxy Z Flip 6</td>
+                                        <td>Điện thoại</td>
+                                        <td>₫ 24,000,000</td>
+                                        <td>15</td>
+                                        <td><span class="badge bg-warning text-dark">Sắp hết</span></td>
+                                        <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP003</td>
+                                        <td>AirPods Pro 2</td>
+                                        <td>Phụ kiện</td>
+                                        <td>₫ 6,000,000</td>
+                                        <td>0</td>
+                                        <td><span class="badge bg-danger">Hết hàng</span></td>
+                                        <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
+                                    </tr>
+                                </tbody> -->
+                                <tbody id="table-products"></tbody>
+                            </table>
+
+                            <!-- <div id="pagination" class="d-flex justify-content-center mt-3"></div> -->
+                            <nav>
+                                <ul id="pagination" class="pagination justify-content-center mt-3"></ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh mục phụ -->
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Sản phẩm mới ra mắt</h6>
+                            <ul id="new-arrivals" class="list-group list-group-flush">
+                                <p class="ms-1">Không có</p>
+                                <!-- <li class="list-group-item">Xiaomi 14 Ultra</li>
+                                <li class="list-group-item">Sony WH-1000XM5</li>
+                                <li class="list-group-item">Apple Watch Ultra 2</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Sản phẩm khuyến mãi</h6>
+                            <ul id="promotions" class="list-group list-group-flush">
+                                <p class="ms-1">Không có</p>
+                                <!-- <li class="list-group-item">iPad Air M2 - giảm 15%</li>
+                                <li class="list-group-item">MacBook Air M3 - giảm 10%</li>
+                                <li class="list-group-item">Tai nghe Beats Fit Pro - giảm 20%</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Sản phẩm ngừng kinh doanh</h6>
+                            <ul id="discontinued" class="list-group list-group-flush">
+                                <p class="ms-1">Không có</p>
+                                <!-- <li class="list-group-item">iPhone 13 Mini</li>
+                                <li class="list-group-item">iPad Pro 2020</li>
+                                <li class="list-group-item">Samsung S20 Ultra</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer py-4  ">
+            <div class="container-fluid">
+                <div class="row align-items-center justify-content-lg-between">
+                    <div class="col-lg-6 mb-lg-0 mb-4">
+                        <div class="copyright text-center text-sm text-muted text-lg-start">
+                            ©
+                            <script>
+                                document.write(new Date().getFullYear())
+                            </script>,
+                            made with <i class="fa fa-heart"></i> by
+                            <a href="#" class="font-weight-bold" target="_blank">Creative Tim</a>
+                            for a better web.
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-muted" target="_blank">Liên hệ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-muted" target="_blank">Chính sách</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-muted" target="_blank">Hỗ trợ</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <div class="fixed-plugin">
+        <div class="card shadow-lg">
+            <div class="card-header pb-0 pt-3">
+                <div class="float-start">
+                    <h5 class="mt-3 mb-0">Tùy chỉnh giao diện</h5>
+                </div>
+                <div class="float-end mt-4">
+                    <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+                        <i class="material-symbols-rounded">clear</i>
+                    </button>
+                </div>
+            </div>
+            <hr class="horizontal dark my-1">
+            <div class="card-body pt-sm-3 pt-0">
+                <div class="mt-2 d-flex">
+                    <h6 class="mb-0">Sáng / Tối</h6>
+                    <div class="form-check form-switch ps-0 ms-auto my-auto">
+                        <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version"
+                            onclick="darkMode(this)">
+                    </div>
+                </div>
+                <hr class="horizontal dark my-sm-4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chi tiết sản phẩm -->
+    <!-- <div class="modal fade show" id="productDetailModal" style="display: block;" role="dialog" tabindex="-1" aria-hidden="true"> -->
+    <div class="modal fade show" id="productDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-2 shadow">
+                <div class="modal-header bg-dark text-white rounded-2 px-5">
+                    <h5 class="modal-title text-white">Chi tiết sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-5">
+                    <div class="row g-4">
+                        <div class="col-md-5 text-center">
+                            <img id="detail-img" src="" alt="Ảnh sản phẩm" class="img-fluid rounded shadow-sm" />
+                        </div>
+                        <div class="col-md-7">
+                            <h5 id="detail-name" class="fw-bold"></h5>
+                            <p class="text-muted mb-1">Hãng: <span id="detail-company"></span></p>
+                            <p class="mb-2">Mã SP: <span id="detail-masp" class="fw-semibold"></span></p>
+                            <h5 class="text-danger mb-3">Giá: <spa id="detail-price"></spa>
+                            </h5>
+                            <p class="mb-0"><strong>Tồn kho:</strong> <span id="detail-stock"></span></p>
+                            <p class="mb-0"><strong>Khuyến mãi:</strong> <span id="detail-promo"></span></p>
+                            <h6 class="fw-bold my-0 mt-2">Cấu hình chi tiết</h6>
+                            <ul class="list-unstyled small ms-3">
+                                <li><strong>Màn hình:</strong> <span id="detail-screen"></span></li>
+                                <li><strong>Hệ điều hành:</strong> <span id="detail-os"></span></li>
+                                <li><strong>Camera sau:</strong> <span id="detail-camara"></span></li>
+                                <li><strong>Camera trước:</strong> <span id="detail-camaraFront"></span></li>
+                                <li><strong>CPU:</strong> <span id="detail-cpu"></span></li>
+                                <li><strong>RAM:</strong> <span id="detail-ram"></span></li>
+                                <li><strong>Bộ nhớ trong:</strong> <span id="detail-rom"></span></li>
+                                <li><strong>Thẻ nhớ:</strong> <span id="detail-microUSB"></span></li>
+                                <li><strong>Pin:</strong> <span id="detail-battery"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button id="editProductBtn" class="btn btn-outline-danger">Chỉnh sửa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--   Core JS Files   -->
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script type="module" src="../assets/js/auth.js"></script>
+    <script src="../assets/js/plugins/chartjs.min.js"></script>
+    <script type="module" src="../assets/js/charts/san-pham.js"></script>
+    <script>
+        const win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            const options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/material-dashboard.js?v=3.2.0"></script>
+    <!-- <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script> -->
+</body>
+
+</html>

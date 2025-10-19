@@ -10,61 +10,33 @@ window.onload = async function () {
     try {
     const res = await fetch("http://localhost:5000/api/products");
     const list_products = await res.json();
-    // autocomplete cho khung tìm kiếm (sau khi có dữ liệu)
-    autocomplete(document.getElementById('search-box'), list_products);
     } catch (err) {
     console.error("Lỗi tải sản phẩm:", err);
   }
 
-    // thêm tags (từ khóa) vào khung tìm kiếm
-    var tags = ["Samsung", "iPhone", "Huawei", "Oppo", "Mobi"];
-    for (var t of tags) addTags(t, "index.html?search=" + t);
+    // Lấy user hiện tại từ server (session)
+    try {
+        const res = await fetch('http://localhost:5000/api/users/me', { credentials: 'include' });
+        const data = await res.json();
+        if (data.success && data.user) {
+            currentUser = data.user;
 
-    raw = getCurrentUser();
-    console.log('Initial currentUser:', raw);
+            // Render thông tin user
+           addInfoUser(currentUser);
 
-    if (raw) {
-        // Đảm bảo địa chỉ được khởi tạo
-        if (raw) {
-        try{
-             const res = await fetch(`http://localhost:5000/api/users/${raw._id}`);
-             const result = await res.json();
-             if(result.success && result.user) {
-             currentUser = result.user;
-             setCurrentUser(currentUser)
-             }
-             else if (result.user) {
-               currentUser = result.user;
-            } else {
-             currentUser = raw; // fallback
-            }
-        } catch (err) {
-             console.error("Lỗi lấy user từ server:", err);
-             currentUser = raw
-            }
-        //lay đơn hàng từ server
-        try {
-    const orderRes = await fetch(`http://localhost:5000/api/orders?userId=${currentUser._id}`);
-    const orders = await orderRes.json();
-         // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng 
-    addTatCaDonHang(orders); // truyền vào danh sách đơn hàng
-  } catch (err) {
-    console.error("Lỗi lấy đơn hàng:", err);
-  }
+            // Render danh sách địa chỉ
+            renderDiachiList(currentUser);
+        } else {
+            document.getElementsByClassName('infoUser')[0].innerHTML = `
+                <h2 style="color:red; text-align:center; padding:50px;">
+                    Bạn chưa đăng nhập !!
+                </h2>`;
+        }
+    } catch (err) {
+        console.error("Lỗi lấy user từ server:", err);
+    }
+};
 
-  addInfoUser(currentUser);
-   // Render danh sách địa chỉ sau khi HTML được tạo
- renderDiachiList(currentUser);
-
-} else {
-  // chưa đăng nhập
-  document.getElementsByClassName('infoUser')[0].innerHTML = `
-    <h2 style="color: red; font-weight:bold; text-align:center; font-size: 2em; padding: 50px;">
-      Bạn chưa đăng nhập !!
-    </h2>`;
-    }      
- }
-}
 
 // Phần Thông tin người dùng
 function addInfoUser(user) {
@@ -72,13 +44,31 @@ function addInfoUser(user) {
     document.getElementsByClassName('infoUser')[0].innerHTML = `
     <hr>
     <table>
-        <tr>
-            <th colspan="3">THÔNG TIN KHÁCH HÀNG</th>
+    <tr>
+            <th>Tài khoản</th>
         </tr>
         <tr>
-            <td>Tài khoản: </td>
+            <th colspan="3">Hồ sơ của tôi</th>
+        </tr>
+        <tr>
+            <td>Tên tài khoản: </td>
             <td> <input type="text" value="` + user.username + `" readonly> </td>
-            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'username')"></i> </td>
+        </tr>
+        <tr>
+        <tr>
+            <td>Họ: </td>
+            <td> <input type="text" value="` + user.ho + `" readonly> </td>
+            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'ho')"></i> </td>
+        </tr>
+        <tr>
+            <td>Tên: </td>
+            <td> <input type="text" value="` + user.ten + `" readonly> </td>
+            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'ten')"></i> </td>
+        </tr>
+        <tr>
+            <td>Email: </td>
+            <td> <input type="text" value="` + user.email + `" readonly> </td>
+            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'email')"></i> </td>
         </tr>
         <tr>
             <td>Mật khẩu: </td>
@@ -111,22 +101,6 @@ function addInfoUser(user) {
                 </table>
             </td>
         </tr>
-        <tr>
-            <td>Họ: </td>
-            <td> <input type="text" value="` + user.ho + `" readonly> </td>
-            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'ho')"></i> </td>
-        </tr>
-        <tr>
-            <td>Tên: </td>
-            <td> <input type="text" value="` + user.ten + `" readonly> </td>
-            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'ten')"></i> </td>
-        </tr>
-        <tr>
-            <td>Email: </td>
-            <td> <input type="text" value="` + user.email + `" readonly> </td>
-            <td> <i class="fa fa-pencil" onclick="changeInfo(this, 'email')"></i> </td>
-        </tr>
-        <tr>
             <td>Địa chỉ: </td>
             <td> 
                 <div id="diachiList"></div>
@@ -134,19 +108,6 @@ function addInfoUser(user) {
                     <i class="fa fa-plus"></i> Thêm địa chỉ
                 </button>
             </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3" style="padding:5px; border-top: 2px solid #ccc;"></td>
-        </tr>
-        <tr>
-            <td>Tổng tiền đã mua: </td>
-            <td> <input type="text" value="` + numToString(tongTienTatCaDonHang) + `₫" readonly> </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Số lượng sản phẩm đã mua: </td>
-            <td> <input type="text" value="` + tongSanPhamTatCaDonHang + `" readonly> </td>
             <td></td>
         </tr>
     </table>`;
@@ -162,7 +123,7 @@ function openChangePass() {
     else khungChangePass.classList.add('active');
 }
 
-function changePass() {
+async function changePass() {
     var khungChangePass = document.getElementById('khungDoiMatKhau');
     var inps = khungChangePass.getElementsByTagName('input');
     if (inps[0].value != currentUser.pass) {
@@ -180,156 +141,73 @@ function changePass() {
         return;
     }
 
-    var temp = copyObject(currentUser);
-    currentUser.pass = inps[1].value;
+   try {
+        const res = await fetch(`http://localhost:5000/api/users/change-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // gửi session cookie
+            body: JSON.stringify({ body: JSON.stringify({
+              oldPassword: inps[0].value,
+              newPassword: inps[1].value
+})
+})
+        });
 
-    setCurrentUser(currentUser);
-    capNhat_ThongTin_CurrentUser();
+        const data = await res.json();
 
-    addAlertBox('Thay đổi mật khẩu thành công.', '#5f5', '#000', 4000);
-    openChangePass();
+        if (!res.ok) {
+            alert(data.error || 'Lỗi khi đổi mật khẩu');
+            return;
+        }
+       currentUser = data.user; // dữ liệu mới từ server
+       capNhat_ThongTin_CurrentUser();
+       addAlertBox('Thay đổi mật khẩu thành công.', '#5f5', '#000', 4000);
+       openChangePass();
+       } catch (err) {
+        console.error(err);
+        alert('Lỗi kết nối server!');
+    }
 }
 
-function changeInfo(iTag, info) {
-    var inp = iTag.parentElement.previousElementSibling.getElementsByTagName('input')[0];
+async function changeInfo(iTag, field) {
+    const inp = iTag.parentElement.previousElementSibling.querySelector('input');
+    
+    if (!inp.readOnly && inp.value !== '') {
+        const value = inp.value;
 
-    if (!inp.readOnly && inp.value != '') {
-
-        if (info == 'username') {
-            var users = getListUser();
-            for (var u of users) {
-                if (u.username == inp.value && u.username != currentUser.username) {
-                    alert('Tên đã có người sử dụng !!');
-                    inp.value = currentUser.username;
-                    return;
-                }
-            }
-            if (!orders.length) {
-                document.getElementsByClassName('listDonHang')[0].innerHTML = `
-                    <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
-                        Xin chào ` + inp.value + `. Bạn chưa có đơn hàng nào.
-                    </h3>`;
+        try {
+            const res = await fetch(`http://localhost:5000/api/users/update`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ field, value })
+            });
+            
+            const data = await res.json();
+            
+            if (!res.ok) {
+                alert(data.error || 'Lỗi khi cập nhật thông tin');
+                inp.value = currentUser[field]; // revert
+                return;
             }
 
-        } else if (info == 'email') {
-            var users = getListUser();
-            for (var u of users) {
-                if (u.email == inp.value && u.username != currentUser.username) {
-                    alert('Email đã có người sử dụng !!');
-                    inp.value = currentUser.email;
-                    return;
-                }
-            }
+            currentUser = data.user; // dữ liệu mới từ server
+            setCurrentUser(currentUser)
+            capNhat_ThongTin_CurrentUser();
+            iTag.innerHTML = '';
+        } catch (err) {
+            console.error(err);
+            alert('Lỗi kết nối server!');
         }
-
-        var temp = copyObject(currentUser);
-        currentUser[info] = inp.value;
-
-        setCurrentUser(currentUser);
-        capNhat_ThongTin_CurrentUser();
-
-        iTag.innerHTML = '';
-
     } else {
         iTag.innerHTML = 'Đồng ý';
         inp.focus();
-        var v = inp.value;
-        inp.value = '';
-        inp.value = v;
     }
 
     inp.readOnly = !inp.readOnly;
 }
 
-// Phần thông tin đơn hàng
-function addTatCaDonHang(orders) {
-    if (!orders.length) {
-        document.getElementsByClassName('listDonHang')[0].innerHTML = `
-            <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
-                Xin chào ` + currentUser.username + `. Bạn chưa có đơn hàng nào.
-            </h3>`;
-        return;
-    }
-    for (var dh of orders) {
-        addDonHang(dh);
-    }
-}
 
-function addDonHang(dh) {
-    var div = document.getElementsByClassName('listDonHang')[0];
-
-    var s = `
-            <table class="listSanPham">
-                <tr> 
-                    <th colspan="8">
-                        <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngayDat).toLocaleString() + `</h3> 
-                        ` + (dh.diaChiNhanHang ? '<p style="text-align:center; color: #666; margin: 5px 0;"><i class="fa fa-map-marker"></i> Địa chỉ nhận hàng: ' + dh.diaChiNhanHang + '</p>' : '') + `
-                    </th>
-                </tr>
-                <tr>
-                    <th>STT</th>
-                    <th>Sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền</th>
-                    <th>Thời gian thêm vào giỏ</th>
-                    <th>Phương thức thanh toán</th>
-                    <th>Địa chỉ nhận hàng</th>
-                </tr>`;
-
-    var totalPrice = 0;
-    for (var i = 0; i < dh.products.length; i++) {
-        var masp = dh.products[i].masp;
-        var soluongSp = dh.products[i].soLuong;
-        var p=dh.products[i];
-        var price =p.gia;
-        var thoigian = new Date(dh.ngayDat).toLocaleString();
-        var thanhtien = price * soluongSp;
-
-        var phuongThucThanhToan = dh.paymentMethod || 'Chưa xác định';
-        var trangThaiThanhToan = dh.paymentStatus || 'Chưa thanh toán';
-        var paymentInfo = phuongThucThanhToan;
-        if (phuongThucThanhToan !== 'Chưa xác định') {
-            paymentInfo += '<br><small style="color: ' + (trangThaiThanhToan === 'Đã thanh toán' ? 'green' : 'orange') + ';">' + trangThaiThanhToan + '</small>';
-        }
-
-        s += `
-                <tr>
-                    <td>` + (i + 1) + `</td>
-                    <td class="noPadding imgHide">
-                        <a target="_blank" href="chitietsanpham.html?` + p.ten.split(' ').join('-') + `" title="Xem chi tiết">
-                            ` + p.ten + `
-                            <img src="` + p.product.img + `">
-                        </a>
-                    </td>
-                    <td class="alignRight">` + price + ` ₫</td>
-                    <td class="soluong" >
-                         ` + soluongSp + `
-                    </td>
-                    <td class="alignRight">` + numToString(thanhtien) + ` ₫</td>
-                    <td style="text-align: center" >` + thoigian + `</td>
-                    <td style="text-align: center; font-size: 12px;">` + paymentInfo + `</td>
-                    <td style="text-align: center; font-size: 11px; color: #666;">` + (dh.diaChiNhanHang || 'Chưa xác định') + `</td>
-                </tr>
-            `;
-        totalPrice += thanhtien;
-        tongSanPhamTatCaDonHang += soluongSp;
-    }
-    tongTienTatCaDonHang += totalPrice;
-
-    s += `
-                <tr style="font-weight:bold; text-align:center; height: 4em;">
-                    <td colspan="4">TỔNG TIỀN: </td>
-                    <td class="alignRight">` + numToString(totalPrice) + ` ₫</td>
-                    <td style="color: ` + (dh.orderStatus === 'Đang xử lý' ? 'orange' : dh.orderStatus === 'Hoàn tất' ? 'blue' : 'green') + `;">` + dh.orderStatus + `</td>
-                    <td style="text-align: center; font-size: 12px;">` + (dh.phuongThucThanhToan || 'Chưa xác định') + `</td>
-                    <td style="text-align: center; font-size: 11px; color: #666;">` + (dh.diaChiNhanHang || 'Chưa xác định') + `</td>
-                </tr>
-            </table>
-            <hr>
-        `;
-    div.innerHTML += s;
-}
 
 // ========== QUẢN LÝ ĐỊA CHỈ ==========
 
@@ -484,13 +362,13 @@ async function submitAddDiachi() {
         quanHuyen: huyen,
         tinhThanh: tinh
     };
-    const res=await fetch(`http://localhost:5000/api/users/address/${currentUser._id}`,{
-        method:'POST',
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    const res = await fetch('http://localhost:5000/api/users/address', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    credentials: 'include', // gửi cookie session
+    body: JSON.stringify(data)
+});
+
     if(!res.ok){
         alert('Lỗi khi thêm địa chỉ');
     }
@@ -661,11 +539,13 @@ async function submitEditDiachi(index) {
         tinhThanh: city.options[city.selectedIndex].text
     }
     diaChi=currentUser.diaChi[index];
-    const res = await fetch(`http://localhost:5000/api/users/address/${diaChi._id}`, {
+   const res = await fetch(`http://localhost:5000/api/users/address/${diaChi._id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(data)
-  });
+});
+
 
   if (!res.ok) {
     const err = await res.json();
@@ -693,7 +573,9 @@ async function deleteDiachi(index) {
          diaChi=currentUser.diaChi[index];
          const res = await fetch(`http://localhost:5000/api/users/address/${diaChi._id}`, {
          method: 'DELETE',
-  });
+         credentials: 'include'
+});
+
 
   if (!res.ok) {
     const err = await res.json();
@@ -707,7 +589,6 @@ async function deleteDiachi(index) {
         addAlertBox('Đã xóa địa chỉ thành công!', '#5f5', '#000', 3000);
     }
 }
-
 // ============ POPUP CHỌN ĐỊA CHỈ TRONG GIỎ HÀNG ============
 
 // Giả sử hàm này được gọi khi click "Thanh Toán" ở trang giỏ hàng để mở popup chọn địa chỉ
@@ -744,13 +625,14 @@ function openChonDiachiPopup() {
             <h3 style="background: #2196F3; color: white; padding: 10px; text-align: center; border-radius: 5px 5px 0 0;">Chọn địa chỉ nhận hàng</h3>
             <div id="diachiDropdown" style="max-height: 200px; overflow-y: auto;">
     `;
-
+    
     for (var i = 0; i < currentUser.diaChi.length; i++) {
+        const dia = `${currentUser.diaChi[i].diaChiChiTiet}, ${currentUser.diaChi[i].phuongXa}, ${currentUser.diaChi[i].quanHuyen}, ${currentUser.diaChi[i].tinhThanh}`;
         html += `
-            <div style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="selectDiachi(this, '${currentUser.diachi[i].replace(/'/g, "\\'")}')">
+            <div style="display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="selectDiachi(this, '${dia.replace(/'/g, "\\'")}')">
                 <input type="checkbox" style="margin-right: 10px;" ${i === 0 ? 'checked' : ''}>
                 <i class="fa fa-map-marker" style="margin-right: 10px; color: #666;"></i>
-                <span>${currentUser.diaChi[i]}</span>
+                <span>${dia}</span>
             </div>
         `;
     }
@@ -811,7 +693,7 @@ function confirmThanhToan() {
     if (window.confirm('Bạn có chắc chắn muốn thanh toán đơn hàng với địa chỉ: ' + selectedDiachi + '?')) {
         // Logic xử lý thanh toán: Thêm đơn hàng vào currentUser.donhang, cập nhật status, v.v.
         // Giả sử hàm xuLyThanhToan(diachi) ở đây (bạn cần implement dựa trên code gốc)
-        xuLyThanhToan(selectedDiachi);
+        //xuLyThanhToan(selectedDiachi);
         closeChonDiachiPopup();
         addAlertBox('Đơn hàng đã được đặt thành công!', '#5f5', '#000', 5000);
         // Chuyển hướng đến trang xác nhận hoặc reload giỏ hàng
