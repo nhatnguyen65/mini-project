@@ -21943,10 +21943,11 @@ fieldset:disabled .btn {
 }
 
 .btn-outline-primary:hover:not(.active) {
-  background-color: transparent;
-  opacity: 0.75;
+  /* background-color: transparent; */
+  /* opacity: 0.75; */
   box-shadow: none;
-  color: #e91e63;
+  /* color: #e91e63; */
+  color: #fff;
 }
 
 .btn-secondary,

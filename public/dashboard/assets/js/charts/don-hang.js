@@ -427,6 +427,12 @@ function initUpdateOrderStatus() {
             // Cập nhật giao diện trong modal
             document.getElementById("order-status").textContent = newStatus;
 
+            loadOrders()
+                .then((orders) => tableOrder(orders))
+                .catch((error) =>
+                    console.log(`Lỗi trang Đơn Hàng, tableOrder: ${error}`)
+                );
+
             // Có thể reload lại danh sách đơn hàng nếu muốn
             // await loadOrders();
         } catch (err) {
