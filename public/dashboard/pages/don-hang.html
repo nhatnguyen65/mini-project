@@ -244,7 +244,8 @@
                                         </a>
                                     </li>
                                     <li class="mb-2">
-                                        <a id="logoutBtn" class="dropdown-item border-radius-md py-2" href="javascript:;">
+                                        <a id="logoutBtn" class="dropdown-item border-radius-md py-2"
+                                            href="javascript:;">
                                             Đăng xuất
                                         </a>
                                     </li>
@@ -265,7 +266,7 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <h5>Chờ xác nhận</h5>
-                            <h4 class="order-counts text-secondary mb-0">0</h4>
+                            <h4 class="order-counts text-warning mb-0">0</h4>
                         </div>
                     </div>
                 </div>
@@ -305,7 +306,7 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <h5>Hoàn trả</h5>
-                            <h4 class="order-counts text-warning mb-0">0</h4>
+                            <h4 class="order-counts text-secondary mb-0">0</h4>
                         </div>
                     </div>
                 </div>
@@ -370,7 +371,7 @@
                                         <th class="text-center">Mã đơn</th>
                                         <th class="text-center">Khách hàng</th>
                                         <th class="text-center">Ngày đặt</th>
-                                        <th class="text-center">Giá trị</th>
+                                        <th class="text-center">Tổng tiền</th>
                                         <th class="text-center">Trạng thái</th>
                                         <th class="text-center">Hành động</th>
                                     </tr>
@@ -409,6 +410,10 @@
                                 </tbody> -->
                                 <tbody id="table-orders"></tbody>
                             </table>
+
+                            <nav>
+                                <ul id="pagination" class="pagination justify-content-center mt-3"></ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
@@ -472,6 +477,59 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Chi Tiết Đơn Hàng -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-2 shadow">
+                <div class="modal-header bg-dark text-white rounded-2 px-5">
+                    <h5 class="modal-title text-white">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-5">
+                    <div class="mb-3">
+                        <strong>Khách hàng:</strong> <span id="order-customer"></span><br>
+                        <strong>Email:</strong> <span id="order-email"></span><br>
+                        <strong>Địa chỉ nhận hàng:</strong> <span id="order-address"></span><br>
+                        <strong>Ngày đặt:</strong> <span id="order-date"></span><br>
+                        <strong>Phương thức thanh toán:</strong> <span id="order-payment-method"></span><br>
+                        <strong>Trạng thái thanh toán:</strong> <span id="order-payment-status"></span><br>
+                        <strong>Trạng thái đơn hàng:</strong> <span id="order-status"></span><br>
+                        <strong>Tổng tiền:</strong> <span id="order-total"></span><br>
+                    </div>
+
+                    <h6>Sản phẩm trong đơn hàng:</h6>
+                    <table class="table table-bordered table-borderless table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Ảnh</th>
+                                <th class="text-center">Tên</th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="order-products">
+                            <!-- Sản phẩm sẽ được render ở đây -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div> -->
+                <div class="modal-footer px-5">
+                    <select id="order-status-select" class="form-select mb-3 px-2 border" style="width: 120px;">
+                        <option value="Chờ xử lý">Chờ xử lý</option>
+                        <option value="Đang giao">Đang giao</option>
+                        <option value="Hoàn thành">Hoàn thành</option>
+                        <option value="Đã hủy">Đã hủy</option>
+                        <option value="Hoàn trả">Hoàn trả</option>
+                    </select>
+                    <button id="btn-update-status" class="btn btn-primary ms-3">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--   Core JS Files   -->
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -479,7 +537,7 @@
     <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script type="module" src="../assets/js/auth.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
-    <script src="../assets/js/charts/don-hang.js"></script>
+    <script type="module" src="../assets/js/charts/don-hang.js"></script>
     <script>
         const win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

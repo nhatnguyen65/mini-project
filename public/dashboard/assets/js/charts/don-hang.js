@@ -1,15 +1,31 @@
-async function dataOrder() {
-    const res = await fetch("http://localhost:7000/orders");
-    return await res.json();
+import { API_BASE_URL } from "../config.js";
+
+const API_BASE = `${API_BASE_URL}/orders`;
+
+async function loadOrders() {
+    try {
+        const res = await fetch(`${API_BASE}/all`, {
+            method: "GET",
+            credentials: "include",
+        });
+        return await res.json();
+    } catch (error) {
+        console.error(`Lỗi trang Đơn Hàng, loadProducts: ${error}`);
+    }
 }
 
-async function renderOrders({ data }) {
-    const orderCounts = document.querySelectorAll(".card .order-counts");
-    orderCounts.forEach((element, index) => (element.innerText = data[index]));
+async function renderOrders(orders) {
+    // const orderCounts = document.querySelectorAll(".card .order-counts");
+    // orderCounts.forEach(
+    //     (element, index) => (element.innerText = orders[index])
+    // );
+    console.log(orders);
 }
-dataOrder()
-    .then(({ orderStats }) => renderOrders(orderStats))
-    .catch((error) => console.log(error));
+loadOrders()
+    .then((orders) => renderOrders(orders))
+    .catch((error) =>
+        console.log(`Lỗi trang Đơn Hàng, renderOrders: ${error}`)
+    );
 
 const glowPlugin = {
     id: "glow",
@@ -226,53 +242,197 @@ async function renderOrderCharts(data) {
         plugins: [crosshairPlugin, glowPlugin],
     });
 }
-dataOrder()
-    .then((data) => renderOrderCharts(data))
-    .catch((error) => console.log(error));
 
+function formatCurrency(value) {
+    return value.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    });
+}
 function getStatusClass(status) {
     switch (status) {
-        case "Hoàn thành":
-        case "Đã giao":
-            return "bg-success";
+        case "Đang chờ xử lý":
+        case "Chờ xử lý":
+            return "bg-warning";
         case "Đang giao":
             return "bg-info";
-        case "Chờ xác nhận":
-            return "bg-secondary";
+        case "Đã giao":
+        case "Hoàn thành":
+            return "bg-success";
         case "Đã hủy":
             return "bg-danger";
-        case "Hoàn trả":
-            return "bg-warning text-dark";
         default:
-            return "bg-light text-dark";
+            return "bg-secondary";
     }
 }
-function formatCurrency(value) {
-    return "₫ " + value.toLocaleString("vi-VN");
-}
-async function tableOrder(tableOrders) {
+async function tableOrder(orders, currentPage = 1, itemsPerPage = 10) {
     const tbody = document.querySelector("#table-orders");
-    tbody.innerHTML = tableOrders
-        .map(
-            (order) => `
+    const pagination = document.querySelector("#pagination");
+
+    // Tính số trang
+    const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+    // Cắt danh sách sản phẩm cho trang hiện tại
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageOrders = orders.slice(start, end);
+
+    tbody.innerHTML = pageOrders
+        .map((order) => {
+            return `
                 <tr>
-                    <td class="text-center pe-3">${order.orderId}</td>
-                    <td class="ps-5">${order.customerName}</td>
-                    <td class="text-center">${order.date}</td>
-                    <td class="text-center">${formatCurrency(order.amount)}</td>
+                    <td class="text-center pe-3">${order._id}</td>
+                    <td class="ps-5">${order.user.username}</td>
+                    <td class="text-center">${new Date(
+                        order.ngayDat
+                    ).toLocaleDateString("vi-VN")}</td>
+                    <td class="text-center">${formatCurrency(
+                        order.tongTienThanhToan
+                    )}</td>
                     <td class="text-center">
-                        <span class="badge p-2 ${getStatusClass(order.status)}">
-                            ${order.status}
+                        <span class="badge p-2 ${getStatusClass(
+                            order.orderStatus
+                        )}">
+                            ${order.orderStatus}
                         </span>
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary my-1">Chi tiết</button>
+                        <button class="btn btn-sm btn-outline-primary my-1 btn-detail"
+                            data-id="${order._id}">
+                                Chi tiết
+                        </button>
                     </td>
                 </tr>
-            `
+            `;
+        })
+        .join("");
+
+    // Gắn sự kiện cho nút "Chi tiết"
+    tbody.querySelectorAll(".btn-detail").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            try {
+                const res = await fetch(`${API_BASE}/all/${id}`, {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (!res.ok)
+                    throw new Error("Không lấy được dữ liệu đơn hàng!");
+                const order = await res.json();
+                showOrderDetail(order);
+            } catch (err) {
+                alert("Lỗi tải chi tiết đơn hàng: " + err.message);
+            }
+        });
+    });
+
+    // Render nút phân trang ngay sau khi render bảng
+    pagination.innerHTML = Array.from({ length: totalPages }, (_, i) => {
+        const pageNum = i + 1;
+        return `
+        <li class="page-item px-1 ${pageNum === currentPage ? "active" : ""}">
+            <a class="page-link ${
+                pageNum === currentPage
+                    ? "bg-secondary text-white border-secondary"
+                    : ""
+            }" 
+                style="border-radius:0.45rem !important;" 
+                href="#">
+                ${pageNum}
+            </a>
+        </li>
+    `;
+    }).join("");
+    // Gắn sự kiện click để đổi trang
+    pagination.querySelectorAll(".page-link").forEach((btn, index) => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            tableProduct(orders, index + 1, itemsPerPage);
+        });
+    });
+}
+loadOrders()
+    .then((orders) => tableOrder(orders))
+    .catch((error) => console.log(`Lỗi trang Đơn Hàng, tableOrder: ${error}`));
+
+function showOrderDetail(order) {
+    const modalEl = document.getElementById("orderDetailModal");
+    modalEl.dataset.orderId = order._id;
+
+    document.getElementById("order-customer").textContent = order.user.username;
+    document.getElementById("order-email").textContent = order.user.email;
+    document.getElementById("order-address").textContent = order.diaChiNhanHang;
+    document.getElementById("order-date").textContent = new Date(
+        order.ngayDat
+    ).toLocaleString("vi-VN");
+    document.getElementById("order-payment-method").textContent =
+        order.paymentMethod;
+    document.getElementById("order-payment-status").textContent =
+        order.paymentStatus;
+    document.getElementById("order-status").textContent = order.orderStatus;
+    document.getElementById("order-total").textContent = formatCurrency(
+        order.tongTienThanhToan
+    );
+
+    const tbody = document.getElementById("order-products");
+    tbody.innerHTML = order.products
+        .map(
+            (p) => `
+        <tr>
+            <td class="text-center border"><img src="${p.product.img}" alt="${
+                p.ten
+            }" width="50"></td>
+            <td class="border pt-4">${p.ten}</td>
+            <td class="text-center border pt-4">${formatCurrency(p.gia)}</td>
+            <td class="text-center border pt-4">${p.soLuong}</td>
+        </tr>
+    `
         )
         .join("");
+
+    // Đặt lại giá trị select theo trạng thái hiện tại
+    const statusSelect = document.querySelector("#order-status-select");
+    statusSelect.value = order.orderStatus || "Chờ xử lý";
+
+    // Hiển thị modal
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
 }
-dataOrder()
-    .then(({ tableOrders }) => tableOrder(tableOrders))
-    .catch((error) => console.log(error));
+
+// Gắn sự kiện cập nhật trạng thái (chạy 1 lần khi load trang)
+function initUpdateOrderStatus() {
+    const updateBtn = document.querySelector("#btn-update-status");
+    const statusSelect = document.querySelector("#order-status-select");
+    const modalEl = document.getElementById("orderDetailModal");
+
+    updateBtn.addEventListener("click", async () => {
+        const newStatus = statusSelect.value;
+        const orderId = modalEl.dataset.orderId; // lấy id đã lưu
+
+        if (!orderId) return alert("Không xác định được đơn hàng!");
+
+        try {
+            const res = await fetch(`${API_BASE}/all/${orderId}/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (!res.ok) throw new Error("Cập nhật thất bại!");
+            const data = await res.json();
+
+            alert("✅ " + data.message);
+
+            // Cập nhật giao diện trong modal
+            document.getElementById("order-status").textContent = newStatus;
+
+            // Có thể reload lại danh sách đơn hàng nếu muốn
+            // await loadOrders();
+        } catch (err) {
+            console.error(err);
+            alert("❌ Lỗi khi cập nhật trạng thái đơn hàng!");
+        }
+    });
+}
+initUpdateOrderStatus();
