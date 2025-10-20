@@ -5,9 +5,20 @@ const API_BASE = `${API_BASE_URL}/products`;
 async function loadProducts() {
     try {
         const res = await fetch(API_BASE);
+        if (!res.ok) throw new Error("Không lấy được dữ liệu sản phẩm!");
         return await res.json();
     } catch (error) {
         console.error(`Lỗi trang Sản Phẩm, loadProducts: ${error}`);
+    }
+}
+async function loadProductID(id) {
+    try {
+        const res = await fetch(`${API_BASE}/${id}`);
+        if (!res.ok)
+            throw new Error("Không lấy được dữ liệu sản phẩm theo ID !");
+        return await res.json();
+    } catch (err) {
+        alert("Lỗi trang Sản Phẩm, loadProductID: " + err.message);
     }
 }
 
@@ -382,16 +393,13 @@ async function tableProduct(products, currentPage = 1, itemsPerPage = 10) {
     // Gắn sự kiện cho nút "Chi tiết"
     tbody.querySelectorAll(".btn-detail").forEach((btn) => {
         btn.addEventListener("click", async () => {
-            const id = btn.dataset.id;
-            try {
-                const res = await fetch(`${API_BASE}/${id}`);
-                if (!res.ok)
-                    throw new Error("Không lấy được dữ liệu sản phẩm!");
-                const product = await res.json();
-                showProductDetail(product);
-            } catch (err) {
-                alert("Lỗi tải chi tiết sản phẩm: " + err.message);
-            }
+            loadProductID(btn.dataset.id)
+                .then((product) => showProductDetail(product))
+                .catch((error) => {
+                    console.log(
+                        `Lỗi trang Sản Phẩm, showProductDetail: ${error}`
+                    );
+                });
         });
     });
 
@@ -427,6 +435,8 @@ loadProducts()
         console.log(`Lỗi trang Sản Phẩm, tableProduct: ${error}`)
     );
 function showProductDetail(product) {
+    document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
+
     document.getElementById("detail-img").src = `${product.img}`;
     document.getElementById("detail-name").textContent = product.name;
     document.getElementById("detail-company").textContent = product.company;
@@ -486,3 +496,21 @@ async function renderCategories(productCategories) {
 //         renderCategories(productCategories);
 //     })
 //     .catch((error) => console.log(error));
+
+window.addEventListener("pageshow", () => {
+    if (sessionStorage.getItem("shouldReload") === "true") {
+        loadProducts()
+            .then((products) => tableProduct(products))
+            .catch((error) =>
+                console.log(`Lỗi trang Sản Phẩm, tableProduct: ${error}`)
+            );
+        sessionStorage.removeItem("shouldReload");
+
+        loadProductID(sessionStorage.getItem("ProductID"))
+            .then((product) => showProductDetail(product))
+            .catch((error) => {
+                console.log(`Lỗi trang Sản Phẩm, showProductDetail: ${error}`);
+            });
+        sessionStorage.removeItem("ProductID");
+    }
+});

@@ -84,7 +84,11 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(product),
         });
+
         if (!res.ok) throw new Error("Cập nhật sản phẩm thất bại!");
+
+        sessionStorage.setItem("shouldReload", "true");
+        sessionStorage.setItem("ProductID", id);
         alert("Đã cập nhật thành công!");
         history.back();
     } catch (err) {
@@ -93,9 +97,9 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
 });
 
 // Nút hủy
-document
-    .getElementById("cancelBtn")
-    .addEventListener("click", () => history.back());
+document.getElementById("cancelBtn").addEventListener("click", () => {
+    history.back();
+});
 
 // Tải dữ liệu khi trang mở
 loadProduct();
