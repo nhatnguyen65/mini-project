@@ -85,7 +85,7 @@ router.get("/", authMiddleware, async (req, res) => {
         const userId = req.session.userId;
         const orders = await Order.find({ user: userId })
             .populate("user", "username email")
-            .populate("products.product", "img name")
+            .populate("products.product", "img name company")
             .sort({ ngayDat: -1 });
 
         res.status(200).json(orders);
@@ -102,7 +102,7 @@ router.get("/all", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const orders = await Order.find({})
             .populate("user", "username email")
-            .populate("products.product", "img name")
+            .populate("products.product", "img name company")
             .sort({ ngayDat: -1 });
 
         res.status(200).json(orders);
@@ -119,8 +119,7 @@ router.get("/all/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
             .populate("user", "username email")
-            .populate("products.product", "name img price");
-
+            .populate("products.product", "name img price company");
         if (!order)
             return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
 
@@ -189,7 +188,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
         const userId = req.session.userId;
         const order = await Order.findOne({ _id: req.params.id, user: userId })
             .populate("user", "username email")
-            .populate("products.product", "name img price");
+            .populate("products.product", "name img price company");
 
         if (!order)
             return res.status(404).json({ message: "Không tìm thấy đơn hàng" });

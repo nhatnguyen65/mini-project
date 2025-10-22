@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const session = require("express-session"); //dùng để mã hóa cookie session
 const MongoStore = require("connect-mongo"); //
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 const path = require("path");
@@ -44,6 +45,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/users/address", addressRoute);
+app.use("/api/dashboard", dashboardRoutes);
 
 // route cho trang chủ
 app.get("/", (req, res) => {

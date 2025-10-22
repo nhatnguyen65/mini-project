@@ -1,34 +1,29 @@
-async function loadDashboard() {
-    const res = await fetch("http://localhost:7000/dashboard");
+import { API_BASE_URL } from "../config.js";
+
+const API_BASE = `${API_BASE_URL}/dashboard`;
+
+async function loadDashboard(endpoint = "") {
+    const res = await fetch(`${API_BASE}${endpoint}`);
     return await res.json();
 }
 
-async function renderDashboards(data) {
+async function renderDashboards(dashboard) {
     document.getElementById("revenue-today").innerText =
-        data.revenueToday.toLocaleString("vi-VN", {
+        dashboard.revenueToday.toLocaleString("vi-VN", {
             style: "currency",
             currency: "VND",
         });
-    document.getElementById("orders-today").innerText = data.ordersToday;
-    document.getElementById("pending-orders").innerText = data.pendingOrders;
-    document.getElementById("new-customers").innerText = data.newCustomers;
-    document.getElementById("best-seller").innerText = data.bestSeller;
+    document.getElementById("orders-today").innerText = dashboard.ordersToday;
+    document.getElementById("pending-orders").innerText =
+        dashboard.pendingOrders;
+    document.getElementById("new-customers").innerText = dashboard.newCustomers;
+    document.getElementById("best-seller").innerText = dashboard.bestSeller;
     document.getElementById("conversion-rate").innerText =
-        data.conversionRate + "%";
+        dashboard.conversionRate + "%";
 }
-
 loadDashboard()
-    .then((data) => renderDashboards(data))
+    .then((dashboard) => renderDashboards(dashboard))
     .catch((error) => console.log(error));
-
-async function dataDashboard() {
-    // mock API
-    // const res = await fetch(
-    //     "https://4dbc39fd-e5d2-40c6-ba3b-06b5aa4ddc4d.mock.pstmn.io/getData"
-    // );
-    const res = await fetch("http://localhost:7000/overview");
-    return await res.json();
-}
 
 const glowPlugin = {
     id: "glow",
@@ -74,17 +69,13 @@ const crosshairPlugin = {
         }
     },
 };
-function renderDashboardCharts(data) {
+function renderDashboardCharts(overview) {
     const viewLabels = [];
     const viewValues = [];
-    data.views.forEach((element) => {
+    overview.views.forEach((element) => {
         viewLabels.push(element.label);
         viewValues.push(element.value);
     });
-    // const data = Array.from(
-    //     { length: 7 },
-    //     () => Math.floor(Math.random() * 500) + 50
-    // );
     new Chart(document.getElementById("chart-bars-views"), {
         type: "bar",
         data: {
@@ -189,7 +180,7 @@ function renderDashboardCharts(data) {
 
     const revenueLabels = [];
     const revenueValues = [];
-    data.revenue.forEach((element) => {
+    overview.revenue.forEach((element) => {
         revenueLabels.push(element.label);
         revenueValues.push(element.value);
     });
@@ -299,19 +290,11 @@ function renderDashboardCharts(data) {
     const ordersLabels = [];
     const ordersCompleteds = [];
     const ordersTotals = [];
-    data.orders.forEach((element) => {
+    overview.orders.forEach((element) => {
         ordersLabels.push(element.label);
-        ordersCompleteds.push(element.valueCompleted);
+        ordersCompleteds.push(element.valueProcessed);
         ordersTotals.push(element.valueTotal);
     });
-    // const data3 = Array.from(
-    //     { length: 12 },
-    //     () => Math.floor(Math.random() * 500) + 50
-    // );
-    // const dataTotal = Array.from(
-    //     { length: 12 },
-    //     () => Math.floor(Math.random() * 500) + 50
-    // );
     new Chart(document.getElementById("chart-line-orders"), {
         type: "line",
         data: {
@@ -348,7 +331,7 @@ function renderDashboardCharts(data) {
                     data: ordersTotals,
                 },
                 {
-                    label: " Đơn hoàn thành",
+                    label: " Đơn đã xử lý",
                     tension: 0.4,
                     borderWidth: 4,
                     pointRadius: 0,
@@ -466,7 +449,7 @@ function renderDashboardCharts(data) {
     // );
     const brandNames = [];
     const brandOrders = [];
-    data.brands.forEach((element) => {
+    overview.brands.forEach((element) => {
         brandNames.push(element.name);
         brandOrders.push(element.orders);
     });
@@ -568,8 +551,6 @@ function renderDashboardCharts(data) {
         },
     });
 }
-
-// dataTongQuan().then((data) => renderChart(data.stats));
-dataDashboard()
-    .then((data) => renderDashboardCharts(data))
+loadDashboard("/overview")
+    .then((overview) => renderDashboardCharts(overview))
     .catch((error) => console.log(error));
