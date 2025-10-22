@@ -14,17 +14,40 @@ async function loadOrders() {
     }
 }
 
-async function renderOrders(orders) {
-    // const orderCounts = document.querySelectorAll(".card .order-counts");
-    // orderCounts.forEach(
-    //     (element, index) => (element.innerText = orders[index])
-    // );
-    console.log(orders);
+async function renderOrderSummary(orders) {
+    // Đếm số đơn theo trạng thái
+    const statusCounts = {
+        "Chờ xử lý": 0,
+        "Đang giao": 0,
+        "Hoàn thành": 0,
+        "Đã hủy": 0,
+        "Hoàn trả": 0,
+    };
+
+    orders.forEach((order) => {
+        const status = order.orderStatus;
+        if (statusCounts.hasOwnProperty(status)) {
+            statusCounts[status]++;
+        }
+    });
+
+    // Cập nhật vào giao diện
+    document.querySelector(".order-counts.text-warning").innerText =
+        statusCounts["Chờ xử lý"];
+    document.querySelector(".order-counts.text-info").innerText =
+        statusCounts["Đang giao"];
+    document.querySelector(".order-counts.text-success").innerText =
+        statusCounts["Hoàn thành"];
+    document.querySelector(".order-counts.text-danger").innerText =
+        statusCounts["Đã hủy"];
+    document.querySelector(".order-counts.text-secondary").innerText =
+        statusCounts["Hoàn trả"];
 }
+
 loadOrders()
-    .then((orders) => renderOrders(orders))
+    .then((orders) => renderOrderSummary(orders))
     .catch((error) =>
-        console.log(`Lỗi trang Đơn Hàng, renderOrders: ${error}`)
+        console.log(`Lỗi trang Đơn Hàng, renderOrderSummary: ${error}`)
     );
 
 const glowPlugin = {
@@ -70,7 +93,7 @@ const crosshairPlugin = {
         }
     },
 };
-async function renderOrderCharts(data) {
+async function renderOrderCharts(chartData) {
     // Biểu đồ trạng thái đơn hàng
     new Chart(document.getElementById("chart-order-status"), {
         type: "pie",
@@ -82,17 +105,17 @@ async function renderOrderCharts(data) {
             //     "Đã hủy",
             //     "Hoàn trả",
             // ],
-            labels: data.orderStats.statuses,
+            labels: chartData.orderStats.statuses,
             datasets: [
                 {
                     // data: [150, 200, 820, 60, 20],
-                    data: data.orderStats.data,
+                    data: chartData.orderStats.data,
                     backgroundColor: [
-                        "#6c757d",
-                        "#17a2b8",
-                        "#28a745",
-                        "#dc3545",
                         "#ffc107",
+                        "#5254db",
+                        "#28a745",
+                        "#e04f5d",
+                        "#6c757d",
                     ],
                     borderWidth: 3,
                     borderColor: "#FFF",
@@ -161,14 +184,14 @@ async function renderOrderCharts(data) {
             //     "Th11",
             //     "Th12",
             // ],
-            labels: data.orderTrends.labels,
+            labels: chartData.orderTrends.labels,
             datasets: [
                 {
                     label: "Số đơn hàng",
                     // data: [
                     //     100, 120, 150, 180, 200, 250, 300, 280, 270, 320, 310, 350,
                     // ],
-                    data: data.orderTrends.data,
+                    data: chartData.orderTrends.data,
                     borderColor: "#007bff",
                     backgroundColor: "rgba(0,123,255,0.15)",
                     fill: true,
@@ -242,6 +265,58 @@ async function renderOrderCharts(data) {
         plugins: [crosshairPlugin, glowPlugin],
     });
 }
+function processOrderData(orders) {
+    // 🥧 1️⃣ Đếm số lượng đơn theo trạng thái
+    const allStatuses = [
+        "Chờ xử lý",
+        "Đang giao",
+        "Hoàn thành",
+        "Đã hủy",
+        "Hoàn trả",
+    ];
+    const statusCounts = Object.fromEntries(allStatuses.map((s) => [s, 0]));
+
+    orders.forEach((order) => {
+        if (statusCounts.hasOwnProperty(order.orderStatus)) {
+            statusCounts[order.orderStatus]++;
+        }
+    });
+
+    // 📈 2️⃣ Đếm số đơn hàng theo tháng trong năm (từ Tháng 1 đến tháng hiện tại)
+    const monthlyCounts = new Array(12).fill(0);
+    orders.forEach((order) => {
+        const date = new Date(order.ngayDat);
+        const month = date.getMonth(); // 0–11
+        monthlyCounts[month]++;
+    });
+
+    const currentMonth = new Date().getMonth(); // tháng hiện tại (0-11)
+    const labels = Array.from(
+        { length: currentMonth + 1 },
+        (_, i) => `Th${i + 1}`
+    );
+    const data = monthlyCounts.slice(0, currentMonth + 1);
+
+    // ✅ 3️⃣ Trả về dữ liệu
+    return {
+        orderStats: {
+            statuses: allStatuses,
+            data: allStatuses.map((s) => statusCounts[s]),
+        },
+        orderTrends: {
+            labels,
+            data,
+        },
+    };
+}
+loadOrders()
+    .then((orders) => {
+        const chartData = processOrderData(orders);
+        renderOrderCharts(chartData);
+    })
+    .catch((error) =>
+        console.log(`Lỗi trang Đơn Hàng, renderOrderCharts: ${error}`)
+    );
 
 function formatCurrency(value) {
     return value.toLocaleString("vi-VN", {
@@ -251,12 +326,10 @@ function formatCurrency(value) {
 }
 function getStatusClass(status) {
     switch (status) {
-        case "Đang chờ xử lý":
         case "Chờ xử lý":
             return "bg-warning";
         case "Đang giao":
             return "bg-info";
-        case "Đã giao":
         case "Hoàn thành":
             return "bg-success";
         case "Đã hủy":
@@ -427,10 +500,18 @@ function initUpdateOrderStatus() {
             // Cập nhật giao diện trong modal
             document.getElementById("order-status").textContent = newStatus;
 
+            // Render lại dữ liệu sau khi có sự thay đổi
             loadOrders()
                 .then((orders) => tableOrder(orders))
                 .catch((error) =>
                     console.log(`Lỗi trang Đơn Hàng, tableOrder: ${error}`)
+                );
+            loadOrders()
+                .then((orders) => renderOrderSummary(orders))
+                .catch((error) =>
+                    console.log(
+                        `Lỗi trang Đơn Hàng, renderOrderSummary: ${error}`
+                    )
                 );
 
             // Có thể reload lại danh sách đơn hàng nếu muốn

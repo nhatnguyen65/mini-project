@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
             createdAt: { $gte: todayStart, $lte: todayEnd },
         });
 
-        // ✅ Sản phẩm bán chạy nhất (trong tất cả đơn Hoàn thành)
+        // ✅ Sản phẩm bán chạy nhất
         const bestSellerAgg = await Order.aggregate([
             { $match: { orderStatus: "Hoàn thành" } },
             { $unwind: "$products" },
