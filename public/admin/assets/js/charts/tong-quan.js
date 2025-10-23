@@ -225,16 +225,7 @@ function renderDashboardCharts(overview) {
                 tooltip: {
                     callbacks: {
                         title: function (context) {
-                            const weekDays = [
-                                "Thứ 2",
-                                "Thứ 3",
-                                "Thứ 4",
-                                "Thứ 5",
-                                "Thứ 6",
-                                "Thứ 7",
-                                "Chủ Nhật",
-                            ];
-                            return weekDays[context[0].dataIndex];
+                            return revenueLabels[context[0].dataIndex];
                         },
                     },
                     displayColors: false, // ⬅ tắt ô màu ở tooltip
@@ -298,20 +289,6 @@ function renderDashboardCharts(overview) {
     new Chart(document.getElementById("chart-line-orders"), {
         type: "line",
         data: {
-            // labels: [
-            //     "T1",
-            //     "T2",
-            //     "T3",
-            //     "T4",
-            //     "T5",
-            //     "T6",
-            //     "T7",
-            //     "T8",
-            //     "T9",
-            //     "T10",
-            //     "T11",
-            //     "T12",
-            // ],
             labels: ordersLabels,
             datasets: [
                 {
@@ -359,21 +336,7 @@ function renderDashboardCharts(overview) {
                     usePointStyle: true, // 🔹 bắt buộc để thay style
                     callbacks: {
                         title: function (context) {
-                            const months = [
-                                "Tháng 1",
-                                "Tháng 2",
-                                "Tháng 3",
-                                "Tháng 4",
-                                "Tháng 5",
-                                "Tháng 6",
-                                "Tháng 7",
-                                "Tháng 8",
-                                "Tháng 9",
-                                "Tháng 10",
-                                "Tháng 11",
-                                "Tháng 12",
-                            ];
-                            return months[context[0].dataIndex];
+                            return ordersLabels[context[0].dataIndex];
                         },
                         labelPointStyle: function (context) {
                             return {

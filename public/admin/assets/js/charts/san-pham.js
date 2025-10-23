@@ -22,27 +22,6 @@ async function loadProductID(id) {
     }
 }
 
-// async function dataProduct() {
-//     const res = await fetch("http://localhost:7000/products");
-//     return await res.json();
-// }
-
-// async function renderProducts(productSummary) {
-//     document.querySelector("#total-products").innerText =
-//         productSummary.totalProducts.toLocaleString();
-//     document.querySelector("#best-seller").innerText =
-//         productSummary.bestSeller;
-//     document.querySelector(
-//         "#low-stock"
-//     ).innerText = `${productSummary.lowStock} sp`;
-//     document.querySelector("#inventory-value").innerText = `₫ ${(
-//         productSummary.inventoryValue / 1_000_000
-//     ).toFixed()} Triệu`;
-// }
-// dataProduct()
-//     .then(({ productSummary }) => renderProducts(productSummary))
-//     .catch((error) => console.log(error));
-
 async function renderProducts(products) {
     document.querySelector("#total-products").innerText = `${
         products.filter((p) => p.masp).length || 0
@@ -63,7 +42,6 @@ loadProducts()
         console.log(`Lỗi trang Sản Phẩm, renderProducts: ${error}`)
     );
 
-// Plugin Glow
 const glowPlugin = {
     id: "glow",
     beforeDatasetsDraw(chart) {
@@ -85,7 +63,6 @@ const glowPlugin = {
         });
     },
 };
-// Plugin Crosshair (line dọc khi hover)
 const crosshairPlugin = {
     id: "crosshair",
     beforeDatasetsDraw(chart) {
@@ -174,10 +151,11 @@ async function renderProductCharts(data) {
                     // data: [1200, 800, 500, 950],
                     data: data.inventoryStructure.data,
                     backgroundColor: [
-                        "#4e73df",
                         "#1cc88a",
                         "#36b9cc",
-                        "#f6c23e",
+                        "#4e73df",
+                        "#6e11df",
+                        "#a01ecc",
                     ],
                     borderWidth: 3,
                     borderColor: "#fff",
@@ -218,87 +196,158 @@ async function renderProductCharts(data) {
         },
     });
 
-    // 🔹 Biểu đồ Xu hướng doanh số theo tháng
-    new Chart(document.getElementById("chart-sales-trend"), {
-        type: "line",
-        data: {
-            // labels: [
-            //     "01",
-            //     "02",
-            //     "03",
-            //     "04",
-            //     "05",
-            //     "06",
-            //     "07",
-            //     "08",
-            //     "09",
-            //     "10",
-            //     "11",
-            //     "12",
-            // ],
-            labels: data.salesTrend.labels,
-            datasets: [
-                {
-                    label: " Doanh số",
-                    // data: [
-                    //     120, 150, 180, 200, 250, 270, 320, 300, 280, 350, 400,
-                    //     420,
-                    // ],
-                    data: data.salesTrend.data,
-                    borderColor: "#1cc88a",
-                    backgroundColor: "rgba(28,200,138,0.15)",
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointBackgroundColor: "#1cc88a",
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: "#FFF",
-                    pointHoverRadius: 5,
-                    pointHoverBorderColor: "#1cc88a",
-                    pointHoverBorderWidth: 3,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    usePointStyle: true,
-                    callbacks: {
-                        title: (ctx) => `Tháng ${ctx[0].label}`,
-                        label: (ctx) =>
-                            ` ${ctx.dataset.label}: ${ctx.formattedValue} triệu ₫`,
-                        labelPointStyle: () => ({
-                            pointStyle: "rectRounded",
-                            rotation: 0,
-                        }),
-                    },
-                    bodyFont: { size: 14 },
-                    padding: 10,
-                },
-            },
-            interaction: { intersect: false, mode: "index" },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { color: "#555", font: { size: 13 } },
-                    grid: { color: "#eee", borderDash: [5, 5] },
-                },
-                x: {
-                    ticks: { color: "#555", font: { size: 13 } },
-                    grid: { display: false },
-                },
-            },
-        },
-        plugins: [glowPlugin, crosshairPlugin],
-    });
+    // // 🔹 Biểu đồ Xu hướng doanh số theo tháng
+    // new Chart(document.getElementById("chart-sales-trend"), {
+    //     type: "line",
+    //     data: {
+    //         // labels: [
+    //         //     "01",
+    //         //     "02",
+    //         //     "03",
+    //         //     "04",
+    //         //     "05",
+    //         //     "06",
+    //         //     "07",
+    //         //     "08",
+    //         //     "09",
+    //         //     "10",
+    //         //     "11",
+    //         //     "12",
+    //         // ],
+    //         labels: data.salesTrend.labels,
+    //         datasets: [
+    //             {
+    //                 label: " Doanh số",
+    //                 // data: [
+    //                 //     120, 150, 180, 200, 250, 270, 320, 300, 280, 350, 400,
+    //                 //     420,
+    //                 // ],
+    //                 data: data.salesTrend.data,
+    //                 borderColor: "#1cc88a",
+    //                 backgroundColor: "rgba(28,200,138,0.15)",
+    //                 fill: true,
+    //                 tension: 0.4,
+    //                 borderWidth: 3,
+    //                 pointRadius: 4,
+    //                 pointBackgroundColor: "#1cc88a",
+    //                 pointBorderWidth: 2,
+    //                 pointHoverBackgroundColor: "#FFF",
+    //                 pointHoverRadius: 5,
+    //                 pointHoverBorderColor: "#1cc88a",
+    //                 pointHoverBorderWidth: 3,
+    //             },
+    //         ],
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         maintainAspectRatio: false,
+    //         plugins: {
+    //             legend: { display: false },
+    //             tooltip: {
+    //                 usePointStyle: true,
+    //                 callbacks: {
+    //                     title: (ctx) => `Tháng ${ctx[0].label}`,
+    //                     label: (ctx) =>
+    //                         ` ${ctx.dataset.label}: ${ctx.formattedValue} triệu ₫`,
+    //                     labelPointStyle: () => ({
+    //                         pointStyle: "rectRounded",
+    //                         rotation: 0,
+    //                     }),
+    //                 },
+    //                 bodyFont: { size: 14 },
+    //                 padding: 10,
+    //             },
+    //         },
+    //         interaction: { intersect: false, mode: "index" },
+    //         scales: {
+    //             y: {
+    //                 beginAtZero: true,
+    //                 ticks: { color: "#555", font: { size: 13 } },
+    //                 grid: { color: "#eee", borderDash: [5, 5] },
+    //             },
+    //             x: {
+    //                 ticks: { color: "#555", font: { size: 13 } },
+    //                 grid: { display: false },
+    //             },
+    //         },
+    //     },
+    //     plugins: [glowPlugin, crosshairPlugin],
+    // });
 }
-// dataProduct()
-//     .then((data) => renderProductCharts(data))
-//     .catch((error) => console.log(error));
+function processDashboardData(orders, products = []) {
+    // 🔹 1️⃣ Top 5 sản phẩm bán chạy
+    const salesCount = {};
+
+    orders
+        .filter((order) => order.orderStatus === "Hoàn thành") // chỉ tính đơn hoàn thành
+        .forEach((order) => {
+            order.products.forEach((item) => {
+                const name = item.product?.name || item.ten;
+                const qty = item.soLuong || 0;
+
+                if (!salesCount[name]) {
+                    salesCount[name] = 0;
+                }
+                salesCount[name] += qty;
+            });
+        });
+
+    // Chuyển sang mảng và sắp xếp giảm dần
+    const sorted = Object.entries(salesCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    const topProducts = {
+        labels: sorted.map(([name]) => name),
+        data: sorted.map(([_, qty]) => qty),
+    };
+
+    // 🔹 2️⃣ Cơ cấu tồn kho theo danh mục
+    const categoryStock = {};
+
+    // Gom tồn kho theo hãng
+    products.forEach((p) => {
+        const company = p.company || "Khác";
+        const stock = p.stock ?? 0;
+
+        if (!categoryStock[company]) categoryStock[company] = 0;
+        categoryStock[company] += stock;
+    });
+
+    // Sắp xếp theo tồn kho tăng dần → Lấy 5 hãng có ít hàng nhất
+    const sorted2 = Object.entries(categoryStock)
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 5);
+
+    // Chuyển sang dạng mà Chart.js cần
+    const inventoryStructure = {
+        labels: sorted2.map(([company]) => company),
+        data: sorted2.map(([_, stock]) => stock),
+    };
+
+    return { topProducts, inventoryStructure };
+}
+async function loadProductCharts() {
+    const [orders, products] = await Promise.all([
+        fetch(`${API_BASE_URL}/orders/all`)
+            .then((res) => res.json())
+            .catch((error) => {
+                console.error(
+                    `Lỗi trang Sản Phẩm, renderProductCharts: ${error}`
+                );
+            }),
+        fetch(API_BASE)
+            .then((res) => res.json())
+            .catch((error) => {
+                console.error(
+                    `Lỗi trang Sản Phẩm, renderProductCharts: ${error}`
+                );
+            }),
+    ]);
+    const chartData = processDashboardData(orders, products);
+    renderProductCharts(chartData);
+}
+loadProductCharts();
 
 // Định dạng tiền tệ VND
 function formatCurrency(value) {
@@ -320,35 +369,6 @@ function getStockStatus(stock) {
     if (stock <= 10) return "Sắp hết";
     return "Còn hàng";
 }
-// async function tableProduct(tableProducts) {
-//     const tbody = document.querySelector("#table-products");
-//     tbody.innerHTML = tableProducts
-//         .map(
-//             (product) => `
-//                 <tr>
-//                     <td class="text-center pe-3">${product.id}</td>
-//                     <td>${product.name}</td>
-//                     <td class="text-center">${product.category}</td>
-//                     <td class="text-center">${formatCurrency(
-//                         product.price
-//                     )}</td>
-//                     <td class="text-center">${product.stock}</td>
-//                     <td class="text-center">
-//                         <span class="badge p-2 ${getStockClass(product.stock)}">
-//                             ${getStockStatus(product.stock)}
-//                         </span>
-//                     </td>
-//                     <td class="text-center">
-//                         <button class="btn btn-sm btn-outline-primary my-1">Chi tiết</button>
-//                     </td>
-//                 </tr>
-//             `
-//         )
-//         .join("");
-// }
-// dataProduct()
-//     .then(({ tableProducts }) => tableProduct(tableProducts))
-//     .catch((error) => console.log(error));
 
 async function tableProduct(products, currentPage = 1, itemsPerPage = 10) {
     const tbody = document.querySelector("#table-products");
@@ -491,11 +511,6 @@ async function renderCategories(productCategories) {
         .map((item) => `<li class="list-group-item">${item}</li>`)
         .join("");
 }
-// dataProduct()
-//     .then(({ productCategories }) => {
-//         renderCategories(productCategories);
-//     })
-//     .catch((error) => console.log(error));
 
 window.addEventListener("pageshow", () => {
     if (sessionStorage.getItem("shouldReload") === "true") {

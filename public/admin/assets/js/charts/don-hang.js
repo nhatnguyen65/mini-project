@@ -43,7 +43,6 @@ async function renderOrderSummary(orders) {
     document.querySelector(".order-counts.text-secondary").innerText =
         statusCounts["Hoàn trả"];
 }
-
 loadOrders()
     .then((orders) => renderOrderSummary(orders))
     .catch((error) =>
@@ -94,6 +93,11 @@ const crosshairPlugin = {
     },
 };
 async function renderOrderCharts(chartData) {
+    // Xóa tất cả chart hiện có
+    Chart.helpers.each(Chart.instances, function (instance) {
+        instance.destroy();
+    });
+
     // Biểu đồ trạng thái đơn hàng
     new Chart(document.getElementById("chart-order-status"), {
         type: "pie",
@@ -502,16 +506,26 @@ function initUpdateOrderStatus() {
 
             // Render lại dữ liệu sau khi có sự thay đổi
             loadOrders()
-                .then((orders) => tableOrder(orders))
-                .catch((error) =>
-                    console.log(`Lỗi trang Đơn Hàng, tableOrder: ${error}`)
-                );
-            loadOrders()
                 .then((orders) => renderOrderSummary(orders))
                 .catch((error) =>
                     console.log(
                         `Lỗi trang Đơn Hàng, renderOrderSummary: ${error}`
                     )
+                );
+            loadOrders()
+                .then((orders) => {
+                    const chartData = processOrderData(orders);
+                    renderOrderCharts(chartData);
+                })
+                .catch((error) =>
+                    console.log(
+                        `Lỗi trang Đơn Hàng, renderOrderCharts: ${error}`
+                    )
+                );
+            loadOrders()
+                .then((orders) => tableOrder(orders))
+                .catch((error) =>
+                    console.log(`Lỗi trang Đơn Hàng, tableOrder: ${error}`)
                 );
 
             // Có thể reload lại danh sách đơn hàng nếu muốn
