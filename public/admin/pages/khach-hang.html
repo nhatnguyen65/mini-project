@@ -244,7 +244,8 @@
                                         </a>
                                     </li>
                                     <li class="mb-2">
-                                        <a id="logoutBtn" class="dropdown-item border-radius-md py-2" href="javascript:;">
+                                        <a id="logoutBtn" class="dropdown-item border-radius-md py-2"
+                                            href="javascript:;">
                                             Đăng xuất
                                         </a>
                                     </li>
@@ -305,7 +306,7 @@
             <!-- Biểu đồ khách hàng -->
             <div class="row">
                 <!-- Phân loại khách hàng -->
-                <div class="col-md-4 mb-md-4 mb-3">
+                <!-- <div class="col-md-4 mb-md-4 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0">Phân loại khách hàng</h6>
@@ -319,10 +320,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Xu hướng hành vi -->
-                <div class="col-md-8 mb-md-4 mb-3">
+                <!-- <div class="col-md-8 mb-md-4 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0">Xu hướng hành vi theo tháng</h6>
@@ -336,12 +337,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="row">
                 <!-- Tần suất mua hàng -->
-                <div class="col-md-6 mb-md-4 mb-3">
+                <!-- <div class="col-md-6 mb-md-4 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0">Tần suất mua hàng</h6>
@@ -355,10 +356,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Phân vị CLV -->
-                <div class="col-md-6 mb-md-4 mb-3">
+                <!-- <div class="col-md-6 mb-md-4 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0">Phân vị CLV (Customer Lifetime Value)</h6>
@@ -372,23 +373,22 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
-            <!-- Bảng khách hàng gần đây -->
+            <!-- Bảng khách hàng  -->
             <div class="row">
                 <div class="col-md-12 mb-md-4 mb-3">
                     <div class="card">
-                        <div class="card-header">Khách hàng gần đây</div>
+                        <div class="card-header">Danh sách khách hàng</div>
                         <div class="card-body">
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">Tên</th>
+                                        <th class="text-center">Họ tên</th>
                                         <th class="ps-6">Email</th>
-                                        <th class="text-center">Lần mua gần nhất</th>
-                                        <th class="text-center">Tổng chi tiêu</th>
-                                        <th class="text-center">Phân loại</th>
+                                        <th class="text-center">Tên đăng nhập</th>
+                                        <th class="text-center">Vai trò</th>
                                         <th class="text-center">Hành động</th>
                                     </tr>
                                 </thead>
@@ -418,8 +418,14 @@
                                         <td><button class="btn btn-sm btn-outline-primary">Xem</button></td>
                                     </tr>
                                 </tbody> -->
-                                <tbody id="table-customers"></tbody>
+                                <tbody id="tbody-users"></tbody>
                             </table>
+                        </div>
+                        <div class="card-footer pt-0">
+                            <div class="d-flex justify-content-center px-5">
+                                <button id="btn-create" class="btn btn-outline-primary">+ Tạo người dùng</button>
+                                <!-- <input type="text" id="search" placeholder="Tìm kiếm theo tên, email..." /> -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -483,6 +489,154 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Chi Tiết Người Dùng  -->
+    <div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-2 shadow">
+                <div class="modal-header bg-dark text-white rounded-2 px-5">
+                    <h5 class="modal-title text-white">Chi tiết người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-5">
+                    <form id="user-form" class="row gy-3">
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-ho" class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Họ:</label>
+                                <input id="user-ho" type="text" class="col form-control fs-6" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-ten"
+                                    class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Tên:</label>
+                                <input id="user-ten" type="text" class="col form-control fs-6" />
+                            </div>
+                        </div>
+                        <div class="col-md-12 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-email"
+                                    class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Email:</label>
+                                <input id="user-email" type="email" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+                        <div class="col-md-12 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-username" class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Tên
+                                    đăng nhập:</label>
+                                <input id="user-username" type="text" class="col form-control fs-6" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-role" class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Vai
+                                    trò:</label>
+                                <select id="user-role" class="col form-select fs-6 px-3">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-status" class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Trạng
+                                    thái:</label>
+                                <select id="user-status" class="col form-select fs-6 px-3">
+                                    <option value="false">Hoạt động</option>
+                                    <option value="true">Đã khóa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="user-addresses" class="col-md-auto form-label text-dark fs-5 m-0 ps-0">Địa
+                                    chỉ (ID)</label>
+                                <ul id="user-addresses" class="col list-group"></ul>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center px-0 mt-4">
+                            <button id="btn-delete-user" class="btn btn-danger me-auto">Xóa tài
+                                khoản</button>
+                            <button type="submit" id="btn-save-user" class="btn btn-outline-primary">Lưu thay
+                                đổi</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tạo Người Dùng -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-2 shadow">
+                <div class="modal-header bg-dark text-white rounded-2 px-5">
+                    <h5 class="modal-title text-white">Tạo người dùng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body px-5">
+                    <form id="create-user-form" class="row gy-3">
+
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-ho" class="col-md-auto form-label fs-5 m-0 ps-0">Họ:</label>
+                                <input id="create-ho" type="text" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-ten" class="col-md-auto form-label fs-5 m-0 ps-0">Tên:</label>
+                                <input id="create-ten" type="text" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-email" class="col-md-auto form-label fs-5 m-0 ps-0">Email:</label>
+                                <input id="create-email" type="email" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-username" class="col-md-auto form-label fs-5 m-0 ps-0">Tên đăng
+                                    nhập:</label>
+                                <input id="create-username" type="text" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-password" class="col-md-auto form-label fs-5 m-0 ps-0">Mật
+                                    khẩu:</label>
+                                <input id="create-password" type="password" class="col form-control fs-6" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 border rounded">
+                            <div class="row d-flex align-items-center px-3">
+                                <label for="create-role" class="col-md-auto form-label fs-5 m-0 ps-0">Vai trò:</label>
+                                <select id="create-role" class="col form-select fs-6 px-3">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center px-0 mt-4">
+                            <button type="submit" class="btn btn-outline-primary ms-auto">Hoàn tất</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <!--   Core JS Files   -->
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap.min.js"></script>
@@ -490,7 +644,7 @@
     <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script type="module" src="../assets/js/auth.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
-    <script src="../assets/js/charts/khach-hang.js"></script>
+    <script type="module" src="../assets/js/charts/khach-hang.js"></script>
     <script>
         const win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

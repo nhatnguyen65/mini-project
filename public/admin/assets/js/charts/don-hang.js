@@ -356,31 +356,35 @@ async function tableOrder(orders, currentPage = 1, itemsPerPage = 10) {
 
     tbody.innerHTML = pageOrders
         .map((order) => {
+            const username = order.user
+                ? order.user.username
+                : "Người dùng đã bị xóa";
+
             return `
-                <tr>
-                    <td class="text-center pe-3">${order._id}</td>
-                    <td class="ps-5">${order.user.username}</td>
-                    <td class="text-center">${new Date(
-                        order.ngayDat
-                    ).toLocaleDateString("vi-VN")}</td>
-                    <td class="text-center">${formatCurrency(
-                        order.tongTienThanhToan
-                    )}</td>
-                    <td class="text-center">
-                        <span class="badge p-2 ${getStatusClass(
-                            order.orderStatus
-                        )}">
-                            ${order.orderStatus}
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary my-1 btn-detail"
-                            data-id="${order._id}">
-                                Chi tiết
-                        </button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td class="text-center pe-3">${order._id}</td>
+                <td class="ps-5">${username}</td>
+                <td class="text-center">
+                    ${new Date(order.ngayDat).toLocaleDateString("vi-VN")}
+                </td>
+                <td class="text-center">
+                    ${formatCurrency(order.tongTienThanhToan)}
+                </td>
+                <td class="text-center">
+                    <span class="badge p-2 ${getStatusClass(
+                        order.orderStatus
+                    )}">
+                        ${order.orderStatus}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary my-1 btn-detail"
+                        data-id="${order._id}">
+                        Chi tiết
+                    </button>
+                </td>
+            </tr>
+        `;
         })
         .join("");
 

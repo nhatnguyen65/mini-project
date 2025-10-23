@@ -1,3 +1,178 @@
+import { API_BASE_URL } from "../config.js";
+
+const API_USER = `${API_BASE_URL}/users`;
+
+async function loadUsers(id = "") {
+    try {
+        const res = await fetch(`${API_USER}/${id}`, {
+            credentials: "include",
+        });
+        return await res.json();
+    } catch (error) {
+        console.error(`Lỗi trang Khách Hàng, loadUsers: ${error}`);
+    }
+}
+
+function renderTable(users) {
+    const tbody = document.querySelector("#tbody-users");
+    tbody.innerHTML = users
+        .map(
+            (u) => `
+            <tr>
+                <td class="ps-3">${u.ho} ${u.ten}</td>
+                <td class="">${u.email}</td>
+                <td class="text-center">${u.username}</td>
+                <td class="text-center">
+                    <span class="badge bg-${
+                        u.role === "admin" ? "danger" : "secondary"
+                    }">
+                        ${u.role}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary my-1 btn-detail" data-id="${
+                        u._id
+                    }">Chi tiết</button>
+                </td>
+            </tr>`
+        )
+        .join("");
+}
+function fetchUsers() {
+    loadUsers()
+        .then((users) => renderTable(users))
+        .catch((error) =>
+            console.log(`Lỗi trang Khách Hàng, renderTable: ${error}`)
+        );
+}
+fetchUsers();
+
+// Xem chi tiết người dùng
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-detail")) {
+        const id = e.target.dataset.id;
+        loadUsers(id)
+            .then(({ user }) => showUserModal(user))
+            .catch((error) =>
+                console.log(`Lỗi trang Khách Hàng, showUserModal: ${error}`)
+            );
+    }
+});
+async function showUserModal(user) {
+    // Điền dữ liệu vào form
+    document.getElementById("user-ho").value = user.ho || "";
+    document.getElementById("user-ten").value = user.ten || "";
+    document.getElementById("user-email").value = user.email || "";
+    document.getElementById("user-username").value = user.username || "";
+    document.getElementById("user-role").value = user.role || "user";
+    document.getElementById("user-status").value = user.off ? "true" : "false";
+
+    const ul = document.getElementById("user-addresses");
+    ul.innerHTML = user.diaChi?.length
+        ? user.diaChi
+              .map((addr) => `<li class="list-group-item">${addr}</li>`)
+              .join("")
+        : `<li class="list-group-item text-muted">Chưa có địa chỉ</li>`;
+
+    // Hiển thị modal
+    const modal = new bootstrap.Modal(
+        document.getElementById("userDetailModal")
+    );
+    modal.show();
+
+    // Gán lại event (tránh lặp)
+    document.getElementById("btn-save-user").onclick = async (e) => {
+        e.preventDefault();
+        const updatedData = {
+            ho: document.getElementById("user-ho").value.trim(),
+            ten: document.getElementById("user-ten").value.trim(),
+            email: document.getElementById("user-email").value.trim(),
+            role: document.getElementById("user-role").value,
+            off: document.getElementById("user-status").value === "true",
+        };
+
+        const res = await fetch(`${API_USER}/${user._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(updatedData),
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Cập nhật người dùng thành công!");
+            modal.hide();
+            fetchUsers(); // gọi lại render bảng
+        } else alert(data.error);
+    };
+
+    document.getElementById("btn-delete-user").onclick = async (e) => {
+        e.preventDefault();
+        if (!confirm("Bạn có chắc muốn xóa người dùng này?")) return;
+
+        const res = await fetch(`${API_USER}/${user._id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Đã xóa người dùng!");
+            modal.hide();
+            fetchUsers();
+        } else alert(data.error);
+    };
+}
+
+// Gán sự kiện mở modal (Thêm người dùng)
+document.getElementById("btn-create").addEventListener("click", () => {
+    const modal = new bootstrap.Modal(
+        document.getElementById("createUserModal")
+    );
+    document.getElementById("create-user-form").reset(); // reset form mỗi khi mở
+    modal.show();
+});
+
+// Gửi request tạo user
+document
+    .getElementById("create-user-form")
+    .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const userData = {
+            ho: document.getElementById("create-ho").value.trim(),
+            ten: document.getElementById("create-ten").value.trim(),
+            email: document.getElementById("create-email").value.trim(),
+            username: document.getElementById("create-username").value.trim(),
+            password: document.getElementById("create-password").value.trim(),
+            role: document.getElementById("create-role").value,
+        };
+
+        try {
+            const res = await fetch(API_USER, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // nếu có xác thực cookie
+                body: JSON.stringify(userData),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok)
+                throw new Error(data.error || "Tạo người dùng thất bại!");
+
+            // ✅ Thành công
+            alert("Tạo người dùng thành công!");
+            bootstrap.Modal.getInstance(
+                document.getElementById("createUserModal")
+            ).hide();
+            fetchUsers(); // gọi lại render bảng
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+/*
 async function dataCustomer() {
     const res = await fetch("http://localhost:7000/customers");
     return await res.json();
@@ -365,3 +540,4 @@ dataCustomer()
     .catch((error) =>
         console.log(`Lỗi trang Khách Hàng, tableCustomers: ${error}`)
     );
+*/
