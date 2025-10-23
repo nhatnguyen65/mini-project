@@ -117,7 +117,7 @@
                 <nav aria-label="breadcrumb" class="pb-2 pb-sm-0">
                     <h2 class="breadcrumb bg-transparent m-0 p-0 fs-4">Doanh thu</h2>
                     <p class="text-sm mt-1 mb-0 d-none d-md-block">
-                        Theo dõi doanh số bán hàng.
+                        Theo dõi doanh số bán hàng trong tháng.
                     </p>
                 </nav>
                 <div class="collapse navbar-collapse mt-0 me-md-0" id="navbar">
@@ -300,7 +300,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0 ">Doanh thu và Lợi nhuận theo tháng</h6>
-                            <p class="text-sm "></p>
+                            <p class="text-sm">6 tháng gần nhất</p>
                             <div class="pe-2">
                                 <div class="chart">
                                     <canvas id="chart-revenue-trend" class="chart-canvas" height="380"></canvas>
@@ -325,7 +325,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-0">Cơ cấu doanh thu theo thương hiệu</h6>
-                            <p class="text-sm">Phân bổ theo phần trăm</p>
+                            <p class="text-sm">Top 5 thương hiệu đạt doanh thu cao nhất</p>
                             <div class="pe-2">
                                 <div class="chart">
                                     <canvas id="chart-revenue-pie" class="chart-canvas" height="250"></canvas>
@@ -384,7 +384,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">Sản phẩm</th>
+                                        <th class="text-center">Tên sản phẩm</th>
                                         <th class="text-center">Số đơn</th>
                                         <th class="text-center">Doanh thu</th>
                                         <th class="text-center">Tỷ lệ</th>
@@ -470,7 +470,7 @@
     <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script type="module" src="../assets/js/auth.js"></script>
     <script src="../assets/js/plugins/chartjs.min.js"></script>
-    <script src="../assets/js/charts/doanh-thu.js"></script>
+    <script type="module" src="../assets/js/charts/doanh-thu.js"></script>
     <script>
         const win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

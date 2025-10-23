@@ -1,6 +1,15 @@
-async function dataRevenue() {
-    const res = await fetch("http://localhost:7000/revenue");
-    return await res.json();
+import { API_BASE_URL } from "../config.js";
+
+async function loadRevenue() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/orders/all`, {
+            method: "GET",
+            credentials: "include",
+        });
+        return await res.json();
+    } catch (error) {
+        console.error(`Lỗi trang Doanh Thu, loadRevenue: ${error}`);
+    }
 }
 
 function formatCurrency(value) {
@@ -21,9 +30,57 @@ async function renderRevenues(revenueSummary) {
         "#conversion-rate"
     ).innerText = `${revenueSummary.conversionRate}%`;
 }
+function calculateMonthlyRevenueSummary(orders) {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
 
-dataRevenue()
-    .then(({ revenueSummary }) => renderRevenues(revenueSummary))
+    // 🔹 Lọc đơn trong tháng hiện tại
+    const ordersThisMonth = orders.filter((order) => {
+        const orderDate = new Date(order.ngayDat);
+        return (
+            orderDate.getMonth() === currentMonth &&
+            orderDate.getFullYear() === currentYear
+        );
+    });
+
+    const completedOrders = ordersThisMonth.filter(
+        (o) => o.orderStatus === "Hoàn thành"
+    );
+
+    // 🔹 Tổng doanh thu
+    const revenue = completedOrders.reduce(
+        (sum, o) => sum + (o.tongTienThanhToan || 0),
+        0
+    );
+
+    // 🔹 Tạm tính lợi nhuận (nếu chưa có giá nhập)
+    const profit = revenue * 0.1; // giả sử biên lợi nhuận 20%
+
+    // 🔹 Giá trị trung bình mỗi đơn hoàn thành
+    const averageOrderValue =
+        completedOrders.length > 0 ? revenue / completedOrders.length : 0;
+
+    // 🔹 Tỷ lệ chuyển đổi
+    const conversionRate =
+        ordersThisMonth.length > 0
+            ? ((completedOrders.length / ordersThisMonth.length) * 100).toFixed(
+                  2
+              )
+            : 0;
+
+    return {
+        revenue,
+        profit,
+        averageOrderValue,
+        conversionRate,
+    };
+}
+loadRevenue()
+    .then((orders) => {
+        const revenueSummary = calculateMonthlyRevenueSummary(orders);
+        renderRevenues(revenueSummary);
+    })
     .catch((error) =>
         console.log(`Lỗi trang Doanh Thu, renderRevenues: ${error}`)
     );
@@ -284,19 +341,10 @@ async function renderRevenueCharts(data) {
     new Chart(document.getElementById("chart-revenue-growth"), {
         type: "bar",
         data: {
-            // labels: [
-            //     "Tháng 4",
-            //     "Tháng 5",
-            //     "Tháng 6",
-            //     "Tháng 7",
-            //     "Tháng 8",
-            //     "Tháng 9",
-            // ],
             labels: data.revenueGrowth.labels,
             datasets: [
                 {
-                    label: "Doanh thu",
-                    // data: [12, 15, 18, 20, 23, 25, 26],
+                    label: "Tăng trưởng doanh thu (%)",
                     data: data.revenueGrowth.data,
                     backgroundColor: "#FF9800",
                     borderRadius: { topLeft: 10, topRight: 10 },
@@ -311,19 +359,27 @@ async function renderRevenueCharts(data) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: (ctx) => `${ctx.formattedValue} triệu ₫`,
+                        label: (ctx) => `${ctx.formattedValue}%`, // ✅ đổi từ "triệu ₫" sang "%"
                     },
-                    displayColors: false, // tắt ô màu ở tooltip
+                    displayColors: false,
                     titleFont: { size: 14 },
-                    bodyFont: { size: 14 }, // chữ to hơn
+                    bodyFont: { size: 14 },
                     padding: 10,
                 },
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: "#555", font: { size: 13 } },
+                    ticks: {
+                        color: "#555",
+                        font: { size: 13 },
+                        callback: (val) => `${val}%`, // ✅ trục Y cũng hiển thị %
+                    },
                     grid: { color: "#eee", borderDash: [5, 5] },
+                    title: {
+                        display: true,
+                        font: { size: 14, weight: "bold" },
+                    },
                 },
                 x: {
                     ticks: { color: "#555", font: { size: 13 } },
@@ -333,8 +389,115 @@ async function renderRevenueCharts(data) {
         },
     });
 }
-dataRevenue()
-    .then((data) => renderRevenueCharts(data))
+function generateRevenueChartsData(orders) {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Lấy 6 tháng gần nhất (theo dạng [ {month, year}, ... ])
+    const recentMonths = [];
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(currentYear, currentMonth - i, 1);
+        recentMonths.push({ month: d.getMonth(), year: d.getFullYear() });
+    }
+
+    // Hàm tạo nhãn tháng
+    const labels = recentMonths.map((m) => `Tháng ${m.month + 1}`);
+
+    // ===== 1️⃣ Biểu đồ Doanh thu & Lợi nhuận (revenueTrend) =====
+    const dataRevenue = [];
+    const dataProfit = [];
+
+    recentMonths.forEach(({ month, year }) => {
+        const monthlyOrders = orders.filter((o) => {
+            const d = new Date(o.ngayDat);
+            return (
+                d.getMonth() === month &&
+                d.getFullYear() === year &&
+                o.orderStatus === "Hoàn thành"
+            );
+        });
+
+        const revenue = monthlyOrders.reduce(
+            (sum, o) => sum + (o.tongTienThanhToan || 0),
+            0
+        );
+
+        const profit = revenue * 0.2; // tạm giả định lợi nhuận = 20% doanh thu
+
+        dataRevenue.push((revenue / 1_000_000).toFixed(1)); // triệu ₫
+        dataProfit.push((profit / 1_000_000).toFixed(1));
+    });
+
+    // ===== 2️⃣ Biểu đồ tròn doanh thu theo thương hiệu (revenuePie) =====
+    const brandMap = {};
+
+    // Chỉ lấy đơn hoàn thành
+    orders
+        .filter((o) => o.orderStatus === "Hoàn thành")
+        .forEach((o) => {
+            o.products.forEach((p) => {
+                const brand = p.product?.company?.trim() || "Khác";
+                const revenue = p.gia * p.soLuong;
+                brandMap[brand] = (brandMap[brand] || 0) + revenue;
+            });
+        });
+
+    // Sắp xếp giảm dần theo doanh thu
+    const sorted = Object.entries(brandMap).sort((a, b) => b[1] - a[1]);
+
+    // Lấy 5 thương hiệu top
+    const top5 = sorted.slice(0, 4);
+    const otherTotal = sorted.slice(4).reduce((sum, [, val]) => sum + val, 0);
+
+    const labelsPie = top5.map(([brand]) => brand);
+    const dataPie = top5.map(([, val]) => val);
+
+    // Gom nhóm "Khác" nếu có
+    if (otherTotal > 0) {
+        labelsPie.push("Khác");
+        dataPie.push(otherTotal);
+    }
+
+    // ===== 3️⃣ Biểu đồ tăng trưởng doanh thu theo tháng (revenueGrowth) =====
+    // 🔹 Gom doanh thu theo từng tháng
+    const revenueByMonth = recentMonths.map((m) => {
+        let total = 0;
+        orders
+            .filter((o) => o.orderStatus === "Hoàn thành")
+            .forEach((o) => {
+                const date = new Date(o.ngayDat);
+                if (
+                    date.getMonth() === m.month &&
+                    date.getFullYear() === m.year
+                ) {
+                    total += o.tongTienThanhToan || 0;
+                }
+            });
+        return total;
+    });
+
+    // 🔹 Tính phần trăm tăng trưởng so với tháng trước
+    const dataGrowth = revenueByMonth.map((val, i) => {
+        if (i === 0) return 0;
+        const prev = revenueByMonth[i - 1];
+        if (prev === 0 && val === 0) return 0; // không có gì thay đổi
+        if (prev === 0 && val > 0) return 100; // tăng từ 0 → có doanh thu
+        if (prev > 0 && val === 0) return -100; // từ có → mất doanh thu
+        return (((val - prev) / prev) * 100).toFixed(1);
+    });
+
+    return {
+        revenueTrend: { labels, dataRevenue, dataProfit },
+        revenuePie: { labels: labelsPie, data: dataPie },
+        revenueGrowth: { labels, data: dataGrowth },
+    };
+}
+loadRevenue()
+    .then((orders) => {
+        const chartData = generateRevenueChartsData(orders);
+        renderRevenueCharts(chartData);
+    })
     .catch((error) =>
         console.log(`Lỗi trang Doanh Thu, renderRevenueCharts: ${error}`)
     );
@@ -348,14 +511,63 @@ async function tableTopRevenue(tableRevenues) {
                 <td class="ps-5">${revenue.name}</td>
                 <td class="text-center">${revenue.quantitySold}</td>
                 <td class="text-center">${formatCurrency(revenue.revenue)}</td>
-                <td class="text-center">${revenue.share}%</td>
+                <td class="text-center ps-3">${revenue.share}%</td>
             </tr>
         `
         )
         .join("");
 }
-dataRevenue()
-    .then(({ tableRevenues }) => tableTopRevenue(tableRevenues))
+function getTop10ProductsByRevenue(orders) {
+    const productMap = {};
+
+    // 🔹 Chỉ tính đơn hàng đã hoàn thành
+    orders
+        .filter((o) => o.orderStatus === "Hoàn thành")
+        .forEach((o) => {
+            o.products.forEach((p) => {
+                const name = p.product?.name || "Sản phẩm không xác định";
+                const revenue = p.gia * p.soLuong;
+                const quantity = p.soLuong;
+
+                if (!productMap[name]) {
+                    productMap[name] = {
+                        name,
+                        quantitySold: 0,
+                        revenue: 0,
+                    };
+                }
+
+                productMap[name].quantitySold += quantity;
+                productMap[name].revenue += revenue;
+            });
+        });
+
+    // 🔹 Chuyển sang mảng và sắp xếp giảm dần theo doanh thu
+    const sortedProducts = Object.values(productMap).sort(
+        (a, b) => b.revenue - a.revenue
+    );
+
+    // 🔹 Lấy top 10 sản phẩm
+    const top10 = sortedProducts.slice(0, 10);
+
+    // 🔹 Tính tổng doanh thu của tất cả sản phẩm để tính phần trăm đóng góp
+    const totalRevenue = sortedProducts.reduce((sum, p) => sum + p.revenue, 0);
+
+    // 🔹 Tính tỷ lệ phần trăm từng sản phẩm
+    top10.forEach((p) => {
+        p.share =
+            totalRevenue > 0
+                ? ((p.revenue / totalRevenue) * 100).toFixed(1)
+                : 0;
+    });
+
+    return top10;
+}
+loadRevenue()
+    .then((orders) => {
+        const top10Products = getTop10ProductsByRevenue(orders);
+        tableTopRevenue(top10Products);
+    })
     .catch((error) =>
-        console.log(`Lỗi trang Doanh Thu, tableTopProducts: ${error}`)
+        console.log(`Lỗi trang Doanh Thu, tableTopRevenue: ${error}`)
     );
