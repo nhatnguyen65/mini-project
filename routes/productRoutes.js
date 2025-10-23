@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
+const authMiddleware = require("../middleware/authMiddleware");
+const { adminOnly } = require("../middleware/authMiddleware");
 
 // Lấy danh sách sản phẩm
 router.get("/", async (req, res) => {
@@ -24,25 +26,41 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// Cập nhật sản phẩm theo ID
-router.put("/:id", async (req, res) => {
+// thêm sản phẩm
+router.post("/", authMiddleware, adminOnly, async (req, res) => {
+    try {
+        const newProduct = new Product(req.body);
+        const savedProduct = await newProduct.save();
+        res.status(201).json(savedProduct);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+//Cập nhật sản phẩm (Update)
+router.put("/:id", authMiddleware, adminOnly, async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true } // trả về bản ghi sau khi cập nhật
+            { new: true }
         );
-
         if (!updatedProduct)
             return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-
-        res.json({
-            message: "Cập nhật sản phẩm thành công!",
-            product: updatedProduct,
-        });
+        res.json(updatedProduct);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
+//Xóa sản phẩm (Delete)
+router.delete("/:id", authMiddleware, adminOnly, async (req, res) => {
+    try {
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+        if (!deletedProduct)
+            return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+        res.json({ message: "Sản phẩm đã được xóa" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 module.exports = router;

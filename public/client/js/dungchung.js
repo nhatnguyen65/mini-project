@@ -1,34 +1,39 @@
-var currentUser = null;
+var currentUser=null;
 // Hàm khởi tạo, tất cả các trang đều cần
 async function khoiTao() {
-    try {
-        const res = await fetch("http://localhost:5000/api/products");
-        list_products = await res.json();
-        setupEventTaiKhoan();
-        await capNhat_ThongTin_CurrentUser();
-        addEventCloseAlertButton();
-    } catch (err) {
-        console.error("Lỗi tải sản phẩm:", err);
+     try {
+    const res = await fetch("http://localhost:5000/api/products");
+    list_products = await res.json();
+    setupEventTaiKhoan();
+    await capNhat_ThongTin_CurrentUser();
+    addEventCloseAlertButton();
+    //  Kiểm tra role người dùng
+    if (currentUser && currentUser.role === 'admin') {
+      window.location.href = '/admin/';
+      return;
     }
+  } catch (err) {
+    console.error("Lỗi tải sản phẩm:", err);
+  }   
 }
 
 // ========= Các hàm liên quan tới danh sách sản phẩm =========
 
 async function getListProducts() {
     try {
-        const res = await fetch("http://localhost:5000/api/products");
-        list_products = await res.json();
-        return list_products;
-    } catch (err) {
-        console.error("Lỗi tải sản phẩm:", err);
-        return [];
-    }
+    const res = await fetch("http://localhost:5000/api/products");
+    list_products = await res.json();
+    return list_products;
+  } catch (err) {
+    console.error("Lỗi tải sản phẩm:", err);
+    return [];
+  }
 }
 
 function timKiemTheoTen(list, ten, soluong) {
     var tempList = copyObject(list);
     var result = [];
-    ten = ten.split(" ");
+    ten = ten.split(' ');
 
     for (var sp of tempList) {
         var correct = true;
@@ -61,7 +66,7 @@ function copyObject(o) {
 // ============== ALert Box ===============
 // div có id alert được tạo trong hàm addFooter
 function addAlertBox(text, bgcolor, textcolor, time) {
-    var al = document.getElementById("alert");
+    var al = document.getElementById('alert');
     al.childNodes[0].nodeValue = text;
     al.style.backgroundColor = bgcolor;
     al.style.opacity = 1;
@@ -76,9 +81,8 @@ function addAlertBox(text, bgcolor, textcolor, time) {
 }
 
 function addEventCloseAlertButton() {
-    document
-        .getElementById("closebtn")
-        .addEventListener("mouseover", (event) => {
+    document.getElementById('closebtn')
+        .addEventListener('mouseover', (event) => {
             // event.target.parentElement.style.display = "none";
             event.target.parentElement.style.opacity = 0;
             event.target.parentElement.style.zIndex = 0;
@@ -88,70 +92,61 @@ function addEventCloseAlertButton() {
 // ================ Cart Number + Thêm vào Giỏ hàng ======================
 function animateCartNumber() {
     // Hiệu ứng cho icon giỏ hàng
-    var cn = document.getElementsByClassName("cart-number")[0];
-    cn.style.transform = "scale(2)";
-    cn.style.backgroundColor = "rgba(255, 0, 0, 0.8)";
-    cn.style.color = "white";
+    var cn = document.getElementsByClassName('cart-number')[0];
+    cn.style.transform = 'scale(2)';
+    cn.style.backgroundColor = 'rgba(255, 0, 0, 0.8)';
+    cn.style.color = 'white';
     setTimeout(function () {
-        cn.style.transform = "scale(1)";
-        cn.style.backgroundColor = "transparent";
-        cn.style.color = "red";
+        cn.style.transform = 'scale(1)';
+        cn.style.backgroundColor = 'transparent';
+        cn.style.color = 'red';
     }, 1200);
 }
 
-async function themVaoGioHang(masp, tensp) {
+async function themVaoGioHang(masp,tensp) {
     var user = getCurrentUser();
     if (!user) {
-        alert("Bạn cần đăng nhập để mua hàng !");
+        alert('Bạn cần đăng nhập để mua hàng !');
         showTaiKhoan(true);
         return;
     }
     if (user.off) {
-        alert("Tài khoản của bạn hiện đang bị khóa nên không thể mua hàng!");
-        addAlertBox(
-            "Tài khoản của bạn đã bị khóa bởi Admin.",
-            "#aa0000",
-            "#fff",
-            10000
-        );
+        alert('Tài khoản của bạn hiện đang bị khóa nên không thể mua hàng!');
+        addAlertBox('Tài khoản của bạn đã bị khóa bởi Admin.', '#aa0000', '#fff', 10000);
         return;
     }
     // Lấy thông tin sản phẩm từ list_products
-    const product = list_products.find((p) => p.masp === masp);
+    const product = list_products.find(p => p.masp === masp);
     if (!product) {
-        addAlertBox("Sản phẩm không tồn tại", "#aa0000", "#fff", 3000);
+        addAlertBox('Sản phẩm không tồn tại', '#aa0000', '#fff', 3000);
         return;
     }
 
     try {
-        const res = await fetch(`http://localhost:5000/api/cart/add`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                userId: user._id,
-                productId: product._id,
-                ten: product.name,
-                gia: product.price,
-                soLuong: 1,
-            }),
-        });
+   
+    const res = await fetch(`http://localhost:5000/api/cart/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        userId: user._id,
+        productId:product._id,
+        ten:product.name,
+        gia:product.price,
+        soLuong:1
+      })
+    });
 
-        const result = await res.json();
-        if (!result.success) throw new Error(result.message);
-        animateCartNumber();
-        addAlertBox(
-            "Đã thêm " + product.name + " vào giỏ.",
-            "#17c671",
-            "#fff",
-            3500
-        );
-        setCurrentUser(user); // cập nhật giỏ hàng cho user hiện tại
-        await capNhat_ThongTin_CurrentUser(); // cập nhật giỏ hàng
+    const result = await res.json();
+    if (!result.success) throw new Error(result.message);
+    animateCartNumber();
+    addAlertBox('Đã thêm ' + product.name + ' vào giỏ.', '#17c671', '#fff', 3500);
+    setCurrentUser(user); // cập nhật giỏ hàng cho user hiện tại
+    await capNhat_ThongTin_CurrentUser(); // cập nhật giỏ hàng
     } catch (err) {
-        console.log(err);
-        alert("Lỗi khi thêm sản phẩm vào giỏ!");
-    }
+    console.log(err);
+    alert("Lỗi khi thêm sản phẩm vào giỏ!");
+  }
 }
 
 // ============================== TÀI KHOẢN ============================
@@ -159,16 +154,16 @@ async function themVaoGioHang(masp, tensp) {
 // Lấy user hiện tại từ server (session)
 async function getCurrentUser() {
     try {
-        const res = await fetch("http://localhost:5000/api/users/me", {
-            method: "GET",
-            credentials: "include",
+        const res = await fetch('http://localhost:5000/api/users/me', {
+            method: 'GET',
+            credentials: 'include'
         });
         const data = await res.json();
         if (data.success) {
             return data.user;
         }
     } catch (err) {
-        console.error("Lỗi lấy user hiện tại:", err);
+        console.error('Lỗi lấy user hiện tại:', err);
     }
     return null;
 }
@@ -178,45 +173,45 @@ function setCurrentUser(u) {
     currentUser = u;
 }
 
-async function logIn(form) {
+
+async function logIn(form,event) {
+    event.preventDefault(); // Ngăn form reload
     // Lấy dữ liệu từ form
-    const username = form.username.value;
-    const password = form.pass.value;
+      const username = form.username.value;
+      const password = form.pass.value;
 
     try {
-        const res = await fetch("http://localhost:5000/api/users/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ username, password }),
+        const res = await fetch('http://localhost:5000/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ username, password })
         });
 
         const result = await res.json();
-
         if (!result.success) {
             alert(result.error);
             form.username.focus();
             return false;
         }
-
         setCurrentUser(result.user);
 
-        // ⚠️ chỉ lưu access token tạm thời trong bộ nhớ
-        sessionStorage.setItem("userRole", result.user.role);
-
-        if (result.user.role === "admin") {
-            alert("Xin chào admin!");
-            location.assign("dashboard");
+        // Kiểm tra role ngay
+        if (result.user.role === 'admin') {
+            window.location.assign('/admin/');
         } else {
-            alert(`Xin chào ${result.user.username || "người dùng"}!`);
-            location.reload(); // cập nhật giỏ hàng, tên user
+            location.reload(); // user thường
         }
+
     } catch (err) {
-        alert("Lỗi kết nối server: " + err.message);
+        alert('Lỗi kết nối server: ' + err.message);
     }
 
     return false;
-}
+   
+    
+ }
+
 
 async function signUp(form) {
     const data = {
@@ -224,55 +219,57 @@ async function signUp(form) {
         ten: form.ten.value,
         email: form.email.value,
         username: form.newUser.value,
-        password: form.newPass.value,
+        password: form.newPass.value
     };
     try {
-        const res = await fetch("http://localhost:5000/api/users/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(data),
+        const res = await fetch('http://localhost:5000/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+             credentials: 'include',
+            body: JSON.stringify(data)
         });
         const result = await res.json();
         if (result.success) {
             setCurrentUser(result.user);
-            alert("Đăng ký thành công!");
+            alert('Đăng ký thành công!');
             location.reload();
         } else {
-            alert(result.error || "Đăng ký thất bại!");
+            alert(result.error || 'Đăng ký thất bại!');
         }
     } catch (err) {
         alert(err.message);
     }
 
     return false;
+
+    
 }
 
 // Đăng xuất
 async function logOut() {
     try {
-        const res = await fetch("http://localhost:5000/api/users/logout", {
-            method: "POST",
-            credentials: "include",
+        const res = await fetch('http://localhost:5000/api/users/logout', {
+            method: 'POST',
+            credentials: 'include'
         });
         const data = await res.json();
         if (data.success) {
-            alert("Đăng xuất thành công!");
+            alert('Đăng xuất thành công!');
             currentUser = null;
-            window.location.href = "index.html";
+            window.location.href = 'index.html';
         } else {
-            alert("Đăng xuất thất bại!");
+            alert('Đăng xuất thất bại!');
         }
     } catch (err) {
-        console.error("Lỗi khi đăng xuất:", err);
-        alert("Không thể kết nối server");
+        console.error('Lỗi khi đăng xuất:', err);
+        alert('Không thể kết nối server');
     }
 }
 
 // Hiển thị form tài khoản, giá trị truyền vào là true hoặc false
 function showTaiKhoan(show) {
-    var value = show ? "scale(1)" : "scale(0)";
-    var div = document.getElementsByClassName("containTaikhoan")[0];
+    var value = (show ? "scale(1)" : "scale(0)");
+    var div = document.getElementsByClassName('containTaikhoan')[0];
     div.style.transform = value;
 }
 
@@ -285,79 +282,70 @@ async function checkTaiKhoan() {
         showTaiKhoan(true);
     } else {
         // đã đăng nhập => hiện menu user
-        document
-            .getElementsByClassName("menuMember")[0]
-            .classList.toggle("hide");
+        document.getElementsByClassName('menuMember')[0].classList.toggle('hide');
     }
 }
 
 // Tạo event, hiệu ứng cho form tài khoản
 function setupEventTaiKhoan() {
-    var taikhoan = document.getElementsByClassName("taikhoan")[0];
-    var list = taikhoan.getElementsByTagName("input");
+    var taikhoan = document.getElementsByClassName('taikhoan')[0];
+    var list = taikhoan.getElementsByTagName('input');
 
     // Tạo eventlistener cho input để tạo hiệu ứng label
     // Gồm 2 event onblur, onfocus được áp dụng cho từng input trong list bên trên
-    ["blur", "focus"].forEach(function (evt) {
+    ['blur', 'focus'].forEach(function (evt) {
         for (var i = 0; i < list.length; i++) {
             list[i].addEventListener(evt, function (e) {
                 var label = this.previousElementSibling; // lấy element ĐỨNG TRƯỚC this, this ở đây là input
-                if (e.type === "blur") {
-                    // khi ấn chuột ra ngoài
-                    if (this.value === "") {
-                        // không có value trong input thì đưa label lại như cũ
-                        label.classList.remove("active");
-                        label.classList.remove("highlight");
-                    } else {
-                        // nếu có chữ thì chỉ tắt hightlight chứ không tắt active, active là dịch chuyển lên trên
-                        label.classList.remove("highlight");
+                if (e.type === 'blur') { // khi ấn chuột ra ngoài
+                    if (this.value === '') { // không có value trong input thì đưa label lại như cũ
+                        label.classList.remove('active');
+                        label.classList.remove('highlight');
+                    } else { // nếu có chữ thì chỉ tắt hightlight chứ không tắt active, active là dịch chuyển lên trên
+                        label.classList.remove('highlight');
                     }
-                } else if (e.type === "focus") {
-                    // khi focus thì label active + hightlight
-                    label.classList.add("active");
-                    label.classList.add("highlight");
+                } else if (e.type === 'focus') { // khi focus thì label active + hightlight
+                    label.classList.add('active');
+                    label.classList.add('highlight');
                 }
             });
         }
-    });
+    })
 
     // Event chuyển tab login-signup
-    var tab = document.getElementsByClassName("tab");
+    var tab = document.getElementsByClassName('tab');
     for (var i = 0; i < tab.length; i++) {
-        var a = tab[i].getElementsByTagName("a")[0];
-        a.addEventListener("click", function (e) {
+        var a = tab[i].getElementsByTagName('a')[0];
+        a.addEventListener('click', function (e) {
             e.preventDefault(); // tắt event mặc định
 
             // Thêm active(màu xanh lá) cho li chứa tag a này => ấn login thì login xanh, signup thì signup sẽ xanh
-            this.parentElement.classList.add("active");
+            this.parentElement.classList.add('active');
 
             // Sau khi active login thì phải tắt active sigup và ngược lại
             // Trường hợp a này thuộc login => <li>Login</li> sẽ có nextElement là <li>SignUp</li>
             if (this.parentElement.nextElementSibling) {
-                this.parentElement.nextElementSibling.classList.remove(
-                    "active"
-                );
+                this.parentElement.nextElementSibling.classList.remove('active');
             }
             // Trường hợp a này thuộc signup => <li>SignUp</li> sẽ có .previousElement là <li>Login</li>
             if (this.parentElement.previousElementSibling) {
-                this.parentElement.previousElementSibling.classList.remove(
-                    "active"
-                );
+                this.parentElement.previousElementSibling.classList.remove('active');
             }
 
             // Ẩn phần nhập của login nếu ấn signup và ngược lại
             // href của 2 tab signup và login là #signup và #login -> tiện cho việc getElement dưới đây
-            var target = this.href.split("#")[1];
-            document.getElementById(target).style.display = "block";
+            var target = this.href.split('#')[1];
+            document.getElementById(target).style.display = 'block';
 
-            var hide = target == "login" ? "signup" : "login";
-            document.getElementById(hide).style.display = "none";
-        });
+            var hide = (target == 'login' ? 'signup' : 'login');
+            document.getElementById(hide).style.display = 'none';
+        })
     }
 
     // Đoạn code tạo event trên được chuyển về js thuần từ code jquery
     // Code jquery cho phần tài khoản được lưu ở cuối file này
 }
+
 
 // Cập nhật số lượng hàng trong giỏ hàng + Tên current user
 async function capNhat_ThongTin_CurrentUser() {
@@ -365,44 +353,44 @@ async function capNhat_ThongTin_CurrentUser() {
         const user = await getCurrentUser();
         if (!user) return;
         setCurrentUser(user);
-        if (!currentUser) return;
-        // Lấy giỏ hàng
-        const res = await fetch("http://localhost:5000/api/cart", {
-            credentials: "include",
+    if (!currentUser) return;
+    // Lấy giỏ hàng
+        const res = await fetch('http://localhost:5000/api/cart', {
+            credentials: 'include'
         });
         const data = await res.json();
-        let tongSoLuong = 0;
+    let tongSoLuong = 0;
         if (data.success && data.cart && data.cart.products) {
             for (const item of data.cart.products) tongSoLuong += item.soLuong;
         }
 
-        // Cập nhật giao diện
-        const cartNum = document.getElementsByClassName("cart-number")[0];
+    // Cập nhật giao diện
+        const cartNum = document.getElementsByClassName('cart-number')[0];
         if (cartNum) cartNum.innerText = tongSoLuong;
 
-        const memberEl = document.getElementsByClassName("member")[0];
+        const memberEl = document.getElementsByClassName('member')[0];
         if (memberEl) {
-            const a = memberEl.getElementsByTagName("a")[0];
-            if (a) a.childNodes[2].nodeValue = " " + user.username;
+            const a = memberEl.getElementsByTagName('a')[0];
+            if (a) a.childNodes[2].nodeValue = ' ' + user.username;
         }
 
-        const menuMember = document.getElementsByClassName("menuMember")[0];
-        if (menuMember) menuMember.classList.remove("hide");
+        const menuMember = document.getElementsByClassName('menuMember')[0];
+        if (menuMember) menuMember.classList.remove('hide');
     } catch (err) {
-        console.error("Lỗi cập nhật user:", err);
+        console.error('Lỗi cập nhật user:', err);
     }
+       
 }
+    
 
-// ==================== Những hàm khác =====================
+
+// ==================== Những hàm khác ===================== 
 function numToString(num, char) {
-    return Number(num)
-        .toLocaleString()
-        .split(",")
-        .join(char || ".");
+    return Number(num).toLocaleString().split(',').join(char || '.');
 }
 
 function stringToNum(str, char) {
-    return Number(str.split(char || ".").join(""));
+    return Number(str.split(char || '.').join(''));
 }
 
 // https://www.w3schools.com/howto/howto_js_autocomplete.asp
@@ -410,12 +398,8 @@ function autocomplete(inp, arr) {
     var currentFocus;
 
     inp.addEventListener("keyup", function (e) {
-        if (e.keyCode != 13 && e.keyCode != 40 && e.keyCode != 38) {
-            // not Enter,Up,Down arrow
-            var a,
-                b,
-                i,
-                val = this.value;
+        if (e.keyCode != 13 && e.keyCode != 40 && e.keyCode != 38) { // not Enter,Up,Down arrow
+            var a, b, i, val = this.value;
 
             /*close any already open lists of autocompleted values*/
             closeAllLists();
@@ -435,23 +419,17 @@ function autocomplete(inp, arr) {
             /*for each item in the array...*/
             for (i = 0; i < arr.length; i++) {
                 /*check if the item starts with the same letters as the text field value:*/
-                if (
-                    arr[i].name.substr(0, val.length).toUpperCase() ==
-                    val.toUpperCase()
-                ) {
+                if (arr[i].name.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+
                     /*create a DIV element for each matching element:*/
                     b = document.createElement("DIV");
 
                     /*make the matching letters bold:*/
-                    b.innerHTML =
-                        "<strong>" +
-                        arr[i].name.substr(0, val.length) +
-                        "</strong>";
+                    b.innerHTML = "<strong>" + arr[i].name.substr(0, val.length) + "</strong>";
                     b.innerHTML += arr[i].name.substr(val.length);
 
                     /*insert a input field that will hold the current array item's value:*/
-                    b.innerHTML +=
-                        "<input type='hidden' value='" + arr[i].name + "'>";
+                    b.innerHTML += "<input type='hidden' value='" + arr[i].name + "'>";
 
                     /*execute a function when someone clicks on the item value (DIV element):*/
                     b.addEventListener("click", function (e) {
@@ -467,6 +445,7 @@ function autocomplete(inp, arr) {
                 }
             }
         }
+
     });
     /*execute a function presses a key on the keyboard:*/
     inp.addEventListener("keydown", function (e) {
@@ -477,8 +456,7 @@ function autocomplete(inp, arr) {
             currentFocus++;
             /*and and make the current item more visible:*/
             addActive(x);
-        } else if (e.keyCode == 38) {
-            //up
+        } else if (e.keyCode == 38) { //up
             /*If the arrow UP key is pressed,
             decrease the currentFocus variable:*/
             currentFocus--;
@@ -503,7 +481,7 @@ function autocomplete(inp, arr) {
         /*start by removing the "active" class on all items:*/
         removeActive(x);
         if (currentFocus >= x.length) currentFocus = 0;
-        if (currentFocus < 0) currentFocus = x.length - 1;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
         /*add class "autocomplete-active":*/
         x[currentFocus].classList.add("autocomplete-active");
     }
@@ -535,24 +513,16 @@ function addTags(nameTag, link) {
     var new_tag = `<a href=` + link + `>` + nameTag + `</a>`;
 
     // Thêm <a> vừa tạo vào khung tìm kiếm
-    var khung_tags = document.getElementsByClassName("tags")[0];
+    var khung_tags = document.getElementsByClassName('tags')[0];
     khung_tags.innerHTML += new_tag;
 }
 
 // Thêm sản phẩm vào trang
 function addProduct(p, ele, returnString) {
-    promo = new Promo(p.promo.name, p.promo.value); // class Promo
-    product = new Product(
-        p.masp,
-        p.name,
-        p.img,
-        p.price,
-        p.star,
-        p.rateCount,
-        promo
-    ); // Class product
-
-    return addToWeb(product, ele, returnString);
+	promo = new Promo(p.promo.name, p.promo.value); // class Promo
+	product = new Product(p.masp, p.name, p.img, p.price, p.star, p.rateCount, promo); // Class product
+    
+	return addToWeb(product, ele, returnString);
 }
 
 // Thêm topnav vào trang
@@ -635,7 +605,7 @@ function addHeader() {
                 </div> -->
             </div><!-- End Tools Member -->
         </div> <!-- End Content -->
-    </div> <!-- End Header -->`);
+    </div> <!-- End Header -->`)
 }
 
 // Thêm header2
@@ -681,7 +651,7 @@ function addHeader2() {
                 </div> -->
             </div><!-- End Tools Member -->
         </div> <!-- End Content -->
-    </div> <!-- End Header -->`);
+    </div> <!-- End Header -->`)
 }
 
 function addFooter() {
@@ -714,7 +684,7 @@ function addContainTaiKhoan() {
                 <div id="login">
                     <h1>Chào mừng bạn trở lại!</h1>
 
-                    <form onsubmit="return logIn(this);">
+                    <form onsubmit="return logIn(this,event);">
 
                         <div class="field-wrap">
                             <label>
@@ -732,7 +702,7 @@ function addContainTaiKhoan() {
 
                         <p class="forgot"><a href="#">Quên mật khẩu?</a></p>
 
-                        <button type="submit" class="button button-block" />Tiếp tục</button>
+                        <button type="submit" class="button button-block">Tiếp tục</button>
 
                     </form> <!-- /form -->
 
@@ -811,48 +781,41 @@ function addPlc() {
 
 // https://stackoverflow.com/a/2450976/11898496
 function shuffleArray(array) {
-    let currentIndex = array.length,
-        randomIndex;
+    let currentIndex = array.length,  randomIndex;
 
     // While there remain elements to shuffle...
     while (currentIndex != 0) {
+
         // Pick a remaining element...
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
 
         // And swap it with the current element.
         [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex],
-            array[currentIndex],
-        ];
+        array[randomIndex], array[currentIndex]];
     }
 
     return array;
 }
 
 function checkLocalStorage() {
-    if (typeof Storage == "undefined") {
-        alert(
-            "Máy tính không hỗ trợ LocalStorage. Không thể lưu thông tin sản phẩm, khách hàng!!"
-        );
+    if (typeof (Storage) == "undefined") {
+        alert('Máy tính không hỗ trợ LocalStorage. Không thể lưu thông tin sản phẩm, khách hàng!!');
     } else {
-        console.log("LocaStorage OKE!");
+        console.log('LocaStorage OKE!');
     }
 }
 
 // Di chuyển lên đầu trang
 function gotoTop() {
     if (window.jQuery) {
-        jQuery("html,body").animate(
-            {
-                scrollTop: 0,
-            },
-            100
-        );
+        jQuery('html,body').animate({
+            scrollTop: 0
+        }, 100);
     } else {
-        document.getElementsByClassName("top-nav")[0].scrollIntoView({
-            behavior: "smooth",
-            block: "start",
+        document.getElementsByClassName('top-nav')[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
         });
         document.body.scrollTop = 0; // For Safari
         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
@@ -861,8 +824,8 @@ function gotoTop() {
 
 // Lấy màu ngẫu nhiên
 function getRandomColor() {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
+    var letters = '0123456789ABCDEF';
+    var color = '#';
     for (var i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
@@ -871,26 +834,27 @@ function getRandomColor() {
 
 // Test, not finished
 function auto_Get_Database() {
-    var ul = document.getElementsByClassName("homeproduct")[0];
-    var li = ul.getElementsByTagName("li");
+    var ul = document.getElementsByClassName('homeproduct')[0];
+    var li = ul.getElementsByTagName('li');
     for (var l of li) {
-        var a = l.getElementsByTagName("a")[0];
+        var a = l.getElementsByTagName('a')[0];
         // name
-        var name = a.getElementsByTagName("h3")[0].innerHTML;
+        var name = a.getElementsByTagName('h3')[0].innerHTML;
 
         // price
-        var price = a.getElementsByClassName("price")[0];
-        price = price.getElementsByTagName("strong")[0].innerHTML;
+        var price = a.getElementsByClassName('price')[0]
+        price = price.getElementsByTagName('strong')[0].innerHTML;
 
         // img
-        var img = a.getElementsByTagName("img")[0].src;
+        var img = a.getElementsByTagName('img')[0].src;
         console.log(img);
+
     }
 }
 
 function getThongTinSanPhamFrom_TheGioiDiDong() {
     javascript: (function () {
-        var s = document.createElement("script");
+        var s = document.createElement('script');
         s.innerHTML = `
 			(function () {
 				var ul = document.getElementsByClassName('parameter')[0];
@@ -938,3 +902,4 @@ function getThongTinSanPhamFrom_TheGioiDiDong() {
         document.body.appendChild(s);
     })();
 }
+

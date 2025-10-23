@@ -8,14 +8,10 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 const path = require("path");
-app.use(
-    cors({
-        origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
-        credentials: true,
-    })
-); // frontend trên 5500
+app.use(cors({ origin: "http://localhost:5000", credentials: true })); // frontend trên 5500
+
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "client")));
 
 // ⚠️ session middleware
 app.use(
@@ -47,10 +43,29 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/users/address", addressRoute);
 app.use("/api/dashboard", dashboardRoutes);
 
+// Middleware kiểm tra admin
+function adminMiddleware(req, res, next) {
+    if (!req.session.userId || req.session.role !== "admin") {
+        return res.redirect("/"); // không phải admin → về trang client
+    }
+    next();
+}
+app.use("/admin", (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+});
+
 // route cho trang chủ
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "public", "client", "index.html"));
 });
+// Trang admin
+app.use(
+    "/admin",
+    adminMiddleware,
+    express.static(path.join(__dirname, "public", "admin"))
+);
+
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB connected"))
