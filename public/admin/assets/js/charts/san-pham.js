@@ -507,6 +507,33 @@ function showProductDetail(product) {
             location.href = `chinh-sua-sp.html?id=${product._id}`;
         };
     }
+
+    // Nút xoá sản phẩm
+    document
+        .getElementById("deleteProductBtn")
+        .addEventListener("click", async () => {
+            if (!confirm("Bạn có chắc muốn xoá sản phẩm này không?")) return;
+
+            try {
+                const res = await fetch(`${API_PRODUCT}/${product._id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.error || "Xoá sản phẩm thất bại!");
+                    return;
+                }
+
+                alert("Đã xoá sản phẩm thành công!");
+                location.reload(); // 🔁 tải lại danh sách để hiển thị dữ liệu mới
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi khi xoá sản phẩm!");
+            }
+        });
 }
 
 document.getElementById("createProductBtn").onclick = () => {

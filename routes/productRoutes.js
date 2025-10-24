@@ -141,14 +141,27 @@ router.patch("/:id", async (req, res) => {
 //Xóa sản phẩm (Delete)
 router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-        if (!deletedProduct)
-            return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-        res.json({ message: "Sản phẩm đã được xóa" });
+        const product = await Product.findByIdAndDelete(req.params.id);
+        if (!product)
+            return res
+                .status(404)
+                .json({ error: "Không tìm thấy sản phẩm để xoá!" });
+
+        // 🔹 Xoá luôn sản phẩm trong warehouse (nếu có)
+        const warehouse = await Warehouse.findOne({});
+        if (warehouse) {
+            warehouse.products = warehouse.products.filter(
+                (p) => !p.product.equals(req.params.id)
+            );
+            await warehouse.save();
+        }
+
+        res.json({ message: "Đã xoá sản phẩm thành công!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 /* ===== USER ROUTES ===== */
 // Lấy danh sách sản phẩm
 router.get("/", async (req, res) => {
