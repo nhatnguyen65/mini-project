@@ -10,7 +10,9 @@ window.addEventListener("load", () => {
 
 async function loadProducts() {
     try {
-        const res = await fetch(`${API_PRODUCT}/all`, { credentials: "include" });
+        const res = await fetch(`${API_PRODUCT}/all`, {
+            credentials: "include",
+        });
         if (!res.ok) throw new Error("Không lấy được dữ liệu sản phẩm!");
         return await res.json();
     } catch (error) {
@@ -506,6 +508,11 @@ function showProductDetail(product) {
         };
     }
 }
+
+document.getElementById("createProductBtn").onclick = () => {
+    // chuyển hướng sang trang tạo sản phẩm
+    location.href = "them-moi-sp.html";
+};
 
 async function renderCategories(productCategories) {
     const newArrivals = document.querySelector("#new-arrivals");

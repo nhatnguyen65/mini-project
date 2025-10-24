@@ -57,10 +57,31 @@ router.get("/:id", authMiddleware, adminMiddleware, async (req, res) => {
 // thêm sản phẩm
 router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const newProduct = new Product(req.body);
+        // 1️⃣ Tạo sản phẩm mới
+        const { stock = 0, ...productData } = req.body; // tách stock ra riêng
+        const newProduct = new Product(productData);
         const savedProduct = await newProduct.save();
-        res.status(201).json(savedProduct);
+
+        // 2️⃣ Tìm warehouse hiện tại (nếu chưa có thì tạo mới)
+        let warehouse = await Warehouse.findOne();
+        if (!warehouse) {
+            warehouse = new Warehouse({ products: [] });
+        }
+
+        // 3️⃣ Thêm sản phẩm vào danh sách trong warehouse
+        warehouse.products.push({
+            product: savedProduct._id,
+            stock: Number(stock) || 0,
+        });
+        await warehouse.save();
+
+        // 4️⃣ Trả về kết quả
+        res.status(201).json({
+            ...savedProduct._doc,
+            stock: Number(stock) || 0,
+        });
     } catch (err) {
+        console.error("❌ Lỗi khi thêm sản phẩm:", err);
         res.status(500).json({ error: err.message });
     }
 });
