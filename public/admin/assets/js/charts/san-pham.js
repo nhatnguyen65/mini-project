@@ -1,10 +1,16 @@
 import { API_BASE_URL } from "../config.js";
 
-const API_BASE = `${API_BASE_URL}/products`;
+const API_PRODUCT = `${API_BASE_URL}/products`;
+window.addEventListener("load", () => {
+    if (sessionStorage.getItem("shouldReload") === "true") {
+        sessionStorage.removeItem("shouldReload");
+        location.reload(); // 🔁 tải lại danh sách để hiển thị dữ liệu mới
+    }
+});
 
 async function loadProducts() {
     try {
-        const res = await fetch(API_BASE);
+        const res = await fetch(`${API_PRODUCT}/all`, { credentials: "include" });
         if (!res.ok) throw new Error("Không lấy được dữ liệu sản phẩm!");
         return await res.json();
     } catch (error) {
@@ -13,7 +19,9 @@ async function loadProducts() {
 }
 async function loadProductID(id) {
     try {
-        const res = await fetch(`${API_BASE}/${id}`);
+        const res = await fetch(`${API_PRODUCT}/${id}`, {
+            credentials: "include",
+        });
         if (!res.ok)
             throw new Error("Không lấy được dữ liệu sản phẩm theo ID !");
         return await res.json();
@@ -329,14 +337,17 @@ function processDashboardData(orders, products = []) {
 }
 async function loadProductCharts() {
     const [orders, products] = await Promise.all([
-        fetch(`${API_BASE_URL}/orders/all`)
+        fetch(`${API_BASE_URL}/orders/all`, { credentials: "include" })
             .then((res) => res.json())
             .catch((error) => {
                 console.error(
                     `Lỗi trang Sản Phẩm, renderProductCharts: ${error}`
                 );
             }),
-        fetch(API_BASE)
+        fetch(`${API_PRODUCT}/all`, {
+            // gọi đúng admin route sản phẩm
+            credentials: "include", // gửi cookie session
+        })
             .then((res) => res.json())
             .catch((error) => {
                 console.error(

@@ -158,17 +158,24 @@ async function getCurrentUser() {
             method: 'GET',
             credentials: 'include'
         });
+
+        // Nếu không đăng nhập hoặc lỗi server
+        if (!res.ok) return null;
+
         const data = await res.json();
-        if (data.success) {
+        if (data && data.success && data.user) {
             return data.user;
         }
     } catch (err) {
         console.error('Lỗi lấy user hiện tại:', err);
     }
+
+    // Không có user hợp lệ
     return null;
 }
 
-// Không cần setLocalStorage nữa, chỉ lưu tạm trong biến toàn cục
+
+
 function setCurrentUser(u) {
     currentUser = u;
 }
@@ -213,7 +220,7 @@ async function logIn(form,event) {
  }
 
 
-async function signUp(form) {
+async function signUp(form, event) {
     const data = {
         ho: form.ho.value,
         ten: form.ten.value,

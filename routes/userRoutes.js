@@ -2,31 +2,64 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const authMiddleware = require("../middleware/authMiddleware");
-const { adminOnly } = require("../middleware/authMiddleware");
+const { authMiddleware, adminMiddleware } = require("../middleware/authMiddleware");
 
 //Các thao tác của user
 // Đăng ký
 router.post("/register", async (req, res) => {
     try {
         const { ho, ten, email, username, password } = req.body;
-        const exists = await User.findOne({ $or: [{ username }, { email }] });
-        if (exists)
+
+        // Tìm user trùng username hoặc email
+        const existingUser = await User.findOne({
+            $or: [{ username }, { email }],
+        });
+
+        if (existingUser) {
+            const usernameTaken = existingUser.username === username;
+            const emailTaken = existingUser.email === email;
+
+            let errorMessage = "";
+            if (usernameTaken && emailTaken)
+                errorMessage = "Cả username và email đều đã tồn tại.";
+            else if (usernameTaken)
+                errorMessage = "Username đã tồn tại. Vui lòng chọn tên khác.";
+            else if (emailTaken)
+                errorMessage = "Email này đã được đăng ký. Vui lòng dùng email khác.";
+
             return res.status(400).json({
                 success: false,
-                error: "Username hoặc email đã tồn tại",
+                error: errorMessage,
             });
+        }
 
+        // Hash mật khẩu
         const hashed = await bcrypt.hash(password, 10);
-        const user = new User({ ho, ten, email, username, password: hashed });
+
+        // Tạo user mới
+        const user = new User({
+            ho,
+            ten,
+            email,
+            username,
+            password: hashed,
+        });
         await user.save();
 
         // Lưu session ngay khi đăng ký
         req.session.userId = user._id;
         req.session.username = user.username;
         req.session.role = user.role;
+
         res.status(201).json({ success: true, user });
     } catch (err) {
+        // Bắt lỗi validate mongoose (nếu có)
+        if (err.name === "ValidationError") {
+            const message = Object.values(err.errors)
+                .map((e) => e.message)
+                .join(", ");
+            return res.status(400).json({ success: false, error: message });
+        }
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -145,9 +178,9 @@ router.put("/change-password", authMiddleware, async (req, res) => {
 
 //Các thao tác của admin
 //admin lấy toàn bộ thông tin người dùng
-router.get("/", authMiddleware, adminOnly, async (req, res) => {
+router.get("/", authMiddleware,adminMiddleware, async (req, res) => {
     try {
-        const users = await User.find().select("-password");
+        const users = await User.find().select("-password").populate("diaChi", "-userId");
         res.json(users);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -155,9 +188,9 @@ router.get("/", authMiddleware, adminOnly, async (req, res) => {
 });
 
 // Xem chi tiết 1 user
-router.get("/:id", authMiddleware, adminOnly, async (req, res) => {
+router.get("/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select("-password");
+        const user = await User.findById(req.params.id).select("-password").populate("diaChi", "-userId");;
         if (!user)
             return res
                 .status(404)
@@ -169,7 +202,7 @@ router.get("/:id", authMiddleware, adminOnly, async (req, res) => {
 });
 
 // Tạo user mới (admin tạo)
-router.post("/", authMiddleware, adminOnly, async (req, res) => {
+router.post("/", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { ho, ten, email, username, password, role } = req.body;
         const exists = await User.findOne({ $or: [{ username }, { email }] });
@@ -199,7 +232,7 @@ router.post("/", authMiddleware, adminOnly, async (req, res) => {
 });
 
 // Cập nhật user bất kỳ
-router.put("/:id", authMiddleware, adminOnly, async (req, res) => {
+router.put("/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         // Không cho admin update password trực tiếp
         const { password, ...updateFields } = req.body;
@@ -225,7 +258,7 @@ router.put("/:id", authMiddleware, adminOnly, async (req, res) => {
 });
 
 // Xóa user
-router.delete("/:id", authMiddleware, adminOnly, async (req, res) => {
+router.delete("/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: "User đã bị xóa" });
@@ -235,7 +268,7 @@ router.delete("/:id", authMiddleware, adminOnly, async (req, res) => {
 });
 
 // Thay đổi role
-router.put("/:id/role", authMiddleware, adminOnly, async (req, res) => {
+router.put("/:id/role", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { role } = req.body;
         const user = await User.findById(req.params.id);

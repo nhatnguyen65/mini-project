@@ -29,7 +29,7 @@ app.use(
         },
     })
 );
-const authMiddleware = require("./middleware/authMiddleware");
+const { authMiddleware, adminMiddleware } = require("./middleware/authMiddleware");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -43,18 +43,13 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/users/address", addressRoute);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Middleware kiểm tra admin
-function adminMiddleware(req, res, next) {
-    if (!req.session.userId || req.session.role !== "admin") {
-        return res.redirect("/"); // không phải admin → về trang client
-    }
-    next();
-}
+
 app.use("/admin", (req, res, next) => {
     res.set("Cache-Control", "no-store");
     next();
 });
-
+app.use('/img', express.static(path.join(__dirname, 'public/img')));
+app.use('/admin/pages/img', express.static(path.join(__dirname, 'public/img')));
 // route cho trang chủ
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "client", "index.html"));
